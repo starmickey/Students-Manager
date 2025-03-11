@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { getLogger } from "../config/logger";
 import { getControlRoutes } from "./controlRoutes";
+import { getTranslateRoutes } from "./translateRoutes";
 
 export function getRoutes() {
   const router = Router();
@@ -19,6 +20,7 @@ export function getRoutes() {
 
   // Set up main calls
   router.use("/control", getControlRoutes());
+  router.use("/translate", getTranslateRoutes());
 
   // Set Not Found error response
   router.use("/", (req: Request, res: Response) => {
