@@ -33,7 +33,7 @@ export class Environment {
    *
    * @returns {Environment} - The singleton instance of the Environment class.
    */
-  static getInstance() {
+  static getInstance(): Environment {
     if (!Environment.instance) {
       Environment.instance = new Environment();
     }
@@ -47,7 +47,7 @@ export class Environment {
  *
  * @returns {Environment} - The singleton instance of the Environment class.
  */
-export const getEnvironment = () => Environment.getInstance();
+export const getEnvironment = (): Environment => Environment.getInstance();
 
 /**
  * Enum containing descriptive error messages for missing or invalid environment variables.
