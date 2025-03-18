@@ -7,3 +7,18 @@ export class ConfigError extends Error {
     super(message);
   }
 }
+
+export class APIError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export class BadRequest extends APIError {
+  constructor(message: string) {
+    super(400, message);
+  }
+}

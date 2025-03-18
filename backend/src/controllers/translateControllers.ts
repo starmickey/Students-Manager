@@ -1,16 +1,51 @@
 import { Request, Response } from "express";
-import { getTranslation } from "../repository/translator";
-import { z } from "zod";
+import { createLanguage, createTranslation, getTranslation, updateLanguage, updateTranslation } from "../repository/translator";
 import { handleExceptionResponse } from "./exceptionsHandler";
+import { createLanguageSchema, createTranslationSchema, getTranslationSchema, updateLanguageSchema, updateTranslationSchema } from "../schema/translatorSchemas";
 
-const getTranslationSchema = z.object({
-  word: z
-    .string({ message: "Word is required and must be an string" })
-    .min(1, { message: "Word must have at least one character" }),
-  language: z
-    .string({ message: "Language is required and must be an string" })
-    .min(1, { message: "Missing or invalid string field 'language'" }),
-});
+export async function createLanguageController(req: Request, res: Response) {
+  try {
+    const { name, code } = createLanguageSchema.parse(req.body);
+    const language = await createLanguage(name, code);
+    res.status(201).send(language);
+
+  } catch (error) {
+    handleExceptionResponse(res, error);
+  }
+}
+
+export async function updateLanguageController(req: Request, res: Response) {
+  try {
+    const { id, name, code } = updateLanguageSchema.parse(req.body);
+    const language = await updateLanguage(id, name, code);
+    res.status(204).send(language);
+    
+  } catch (error) {
+    handleExceptionResponse(res, error);
+  }
+}
+
+export async function createTranslationController(req: Request, res: Response) {
+  try {
+    const { word, translations } = createTranslationSchema.parse(req.body);
+    const translation = await createTranslation(word, translations);
+    res.status(201).send(translation);
+
+  } catch (error) {
+    handleExceptionResponse(res, error);
+  }
+}
+
+export async function updateTranslationController(req: Request, res: Response) {
+  try {
+    const { word, translations } = updateTranslationSchema.parse(req.body);
+    const translation = await updateTranslation(word, translations);
+    res.status(204).send(translation);
+
+  } catch (error) {
+    handleExceptionResponse(res, error);
+  }
+}
 
 export async function getTranslationController(req: Request, res: Response) {
   try {
@@ -21,5 +56,4 @@ export async function getTranslationController(req: Request, res: Response) {
   } catch (error) {
     handleExceptionResponse(res, error);
   }
-
 }
