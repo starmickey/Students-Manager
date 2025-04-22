@@ -1,6 +1,14 @@
 import { Model, model, Query, Schema } from "mongoose";
 import { BadRequest } from "../config/exceptions";
 
+/**
+ * LANGUAGE
+ * 
+ * Attributes:
+ *    - name: Full language name in English. E.g. spanish, english
+ *    - code: Language identifier. Has two characters. E.g. es, en
+ */
+
 // Language Interface
 interface ILanguage extends Document {
   name: string;
@@ -23,6 +31,15 @@ const languageSchema = new Schema({
     trim: true,
   },
 });
+
+/**
+ * TRANSLATIONS
+ * 
+ * Attributes:
+ *    - key: Univocal word or phrase in English in lower case used to fetch the translation.
+ *    - translations: Map that stores all of the possible translations. Its entries have this structure:
+ *          { "translationCode": "translation" }
+ */
 
 // Translation interface
 interface ITranslation extends Document {
