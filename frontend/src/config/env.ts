@@ -38,7 +38,7 @@ export const getEnvironment = (): Environment => Environment.getInstance();
  * Enum containing descriptive error messages for missing or invalid environment variables.
  */
 enum ValidationErrors {
-  MISSING_SERVER_URI = "Environment variable 'SERVER_URI' is missing. Please set it to either 'development' or 'production' in your .env file.",
+  MISSING_SERVER_URI = "Environment variable 'SERVER_URI' is missing. Please set it to the path to your server in your .env file",
 }
 
 

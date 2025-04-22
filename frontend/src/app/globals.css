@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette: https://colorhunt.co/palette/fcc737f26b0fe738797e1891 */
+  --gray: #71717A;
+  --pink-10: #E2115E;
+  --pink-12: #BA0045;
+  --red: #F31260;
+  --yellow-3: #faeecc;
+  --yellow-7: #FFDF86;
+  --yellow-10: #FCC737;
+  --white: white;
+
+  --color-bg-overlay: var(--yellow-10);
+  --color-bg-base: var(--yellow-7);
+
+  --color-text-base: #171717;
+  --color-text-danger: var(--red);
+  --color-text-outline: var(--white);
+  --color-text-muted: var(--gray);
+
+  --comp-color-primary-bg: var(--pink-10);
+  --comp-color-primary-bg-hover: var(--pink-12);
+  --comp-color-primary-text: var(--white);
+
+  
+  /* --secondary: #446072; */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-bg-base);
+  --color-foreground: var(--color-text-base);
+  --color-primary: var(--comp-color-primary-bg);
+  --color-danger: var(--color-text-danger);
+  --color-muted: var(--color-text-muted);
+  /* --color-secondary: var(--secondary); */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --color-bg-base: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg-base);
+  color: var(--color-text-base);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+a {
+  color: var(--comp-color-primary-bg);
+}
+a:hover {
+  color: var(--comp-color-primary-bg-hover);
+}
+
+/* DISPLAYS */
+
+.img-overlay {
+  height: 100vh;
+  position: absolute;
+  width: 100vw;
+}
+
+.floating-box-overlay {
+  align-items: center;
+  background-color: var(--color-bg-overlay);
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  position: absolute;
+  width: 100vw;
+}
+
+.floating-box {
+  align-items: center;
+  background-color: var(--color-bg-base);
+  border-radius: 20px;
+  box-shadow: 10px 10px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  z-index: 100;
+}
+
+.floating-box-small {
+  width: 90%;
+  max-width: 330px;
+}
+
+.floating-box h1 {
+  color: var(--comp-color-primary-bg);
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1.5rem auto;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+
+/* FORMS */
+
+.input-group .input-group-content {
+  background-color: var(--yellow-3);
+  border-radius: 12px;
+  padding: 4px 12px 6px 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.input-group .input-group-content:focus-within {
+  box-shadow: 0 0 8px var(--comp-color-primary-bg); /* Glowing effect */
+}
+
+.input-group .input-group-content input {
+  width: 100%;
+}
+.input-group .input-group-content input:focus,
+.input-group .input-group-content input:-webkit-autofill {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  width: 100%;
+}
+
+.input-group input::-webkit-input-placeholder {
+  background-color: transparent;
+  color: var(--color-text-muted);
+}
+
+.button {
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.button-primary {
+  color: var(--comp-color-primary-text);
+  background-color: var(--comp-color-primary-bg);
+}
+.button-primary:hover {
+  background-color: var(--comp-color-primary-bg-hover);
+}
+
