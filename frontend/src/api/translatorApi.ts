@@ -1,11 +1,11 @@
 import { getEnvironment } from "@/config/env";
 
-export async function fetchTranslation(word: string, languageCode: string): Promise<string> {
-  const { serverURI } = getEnvironment();
+export async function fetchTranslation(word: string): Promise<string> {
+  const { serverURI, language } = getEnvironment();
 
   const url = new URL("/translate", serverURI);
   url.searchParams.append("word", word);
-  url.searchParams.append("language", languageCode);
+  url.searchParams.append("language", language);
 
   const response = await fetch(url.toString());
   if (!response.ok) {
@@ -23,8 +23,8 @@ export async function fetchTranslation(word: string, languageCode: string): Prom
   // }))
 }
 
-export async function fetchTranslations(words: string[], lang: string) {
-  const promises = words.map(w => fetchTranslation(w, lang));
+export async function fetchTranslations(words: string[]) {
+  const promises = words.map(w => fetchTranslation(w));
   const translations = await Promise.all(promises);
   return translations;
 }

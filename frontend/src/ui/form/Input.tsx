@@ -1,4 +1,4 @@
-import { fetchTranslation, fetchTranslations } from "@/api/translatorApi";
+import { fetchTranslation } from "@/api/translatorApi";
 import { Suspense } from "react";
 import WordSkeleton from "../WordSkeleton";
 
@@ -6,7 +6,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;
   variant: "primary";
-  language: string;
   isRequired: boolean;
   errorMessage?: string;
 }
@@ -18,12 +17,11 @@ async function InputComponent({
   isRequired,
   errorMessage,
   variant,
-  language,
   ...inputProps
 }: InputProps) {
-  const translatedLabel = await fetchTranslation(label, language);
+  const translatedLabel = await fetchTranslation(label);
   const translatedErrorMessage = errorMessage
-    ? await fetchTranslation(errorMessage, language)
+    ? await fetchTranslation(errorMessage)
     : undefined;
 
   return (

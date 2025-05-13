@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createLanguage, createTranslation, getTranslation, updateLanguage, updateTranslation } from "../repository/translator";
+import { createLanguage, createTranslation, getTranslation, updateLanguage, updateTranslation } from "../repository/translatorRepository";
 import { handleExceptionResponse } from "./exceptionsHandler";
 import { createLanguageSchema, createTranslationSchema, getTranslationSchema, updateLanguageSchema, updateTranslationSchema } from "../schema/translatorSchemas";
 

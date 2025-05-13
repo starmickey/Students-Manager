@@ -2,16 +2,16 @@ import { fetchTranslation } from "@/api/translatorApi";
 import { Suspense } from "react";
 import WordSkeleton from "./WordSkeleton";
 
-export async function TranslatedWord({ word, lang }: { word: string, lang: string }) {
-  const translation = await fetchTranslation(word, lang);
+export async function TranslatedWord({ word }: { word: string }) {
+  const translation = await fetchTranslation(word);
   return <>{translation}</>
 }
 
 
-export function TranslatedWordWrapper({ children, lang }: { children: string, lang: string }) {
+export function TranslatedWordWrapper({ children }: { children: string }) {
   return (
     <Suspense fallback={<WordSkeleton />}>
-      <TranslatedWord word={children} lang={lang}/>
+      <TranslatedWord word={children}/>
     </Suspense>
   )
 }

@@ -3,12 +3,12 @@ import { getEnvironment } from "./config/env";
 import { initLogger } from "./config/logger";
 import { initExpress } from "./express";
 
-const { nodeEnv, port, mongoUri } = getEnvironment();
+const conf = getEnvironment();
 
-const logger = initLogger(nodeEnv);
+const logger = initLogger(conf.nodeEnv);
 
-initExpress(port);
+initExpress(conf);
 
-mongoose.connect(mongoUri).then(() => {
+mongoose.connect(conf.mongoUri).then(() => {
   logger.info("Mongoose connection stablished");
 });

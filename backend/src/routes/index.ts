@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { getLogger } from "../config/logger";
 import { getControlRoutes } from "./controlRoutes";
 import { getLanguageRoutes, getTranslateRoutes } from "./translateRoutes";
+import { getSecurityRoutes } from "./securityRoutes";
 
 export function getRoutes() {
   const router = Router();
@@ -19,6 +20,7 @@ export function getRoutes() {
   });
 
   // Set up main calls
+  router.use("/auth", getSecurityRoutes());
   router.use("/control", getControlRoutes());
   router.use("/translate", getTranslateRoutes());
   router.use("/language", getLanguageRoutes());

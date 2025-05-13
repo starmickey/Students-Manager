@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { ConfigError } from "./exceptions";
+import { GoogleCredentials } from "../middleware/passport";
 
 /**
  * Defines the possible values for the application's environment mode.
@@ -18,6 +19,9 @@ export class Environment {
   nodeEnv: NodeEnv;
   port: number;
   mongoUri: string;
+  googleCredentials: GoogleCredentials;
+  jswSecret: string;
+  loginRedirectPath: string | undefined;
 
   private constructor() {
     validateEnvironment(process.env);
@@ -25,6 +29,12 @@ export class Environment {
     this.nodeEnv = process.env.NODE_ENV as NodeEnv;
     this.port = Number(process.env.PORT);
     this.mongoUri = process.env.MONGO_URI || "";
+    this.googleCredentials = {
+      clientID: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }
+    this.jswSecret = process.env.JWT_SECRET || "";
+    this.loginRedirectPath = process.env.LOGIN_REDIRECT_PATH;
   }
 
   /**
@@ -58,6 +68,9 @@ enum ValidationErrors {
   MISSING_PORT = "Environment variable 'PORT' is missing. Please define a valid port number in your .env file.",
   INVALID_PORT = "Invalid 'PORT' value detected. It must be a positive integer.",
   MISSING_MONGO_URI = "Environment variable 'MONGO_URI' is missing. Please specify the database connection string in your .env file.",
+  MISSING_GOOGLE_CLIENT_ID = "Environment variable 'GOOGLE_CLIENT_ID' is missing. Please specify the database connection string in your .env file.",
+  MISSING_GOOGLE_CLIENT_SECRET = "Environment variable 'GOOGLE_CLIENT_SECRET' is missing. Please specify the database connection string in your .env file.",
+  MISSING_JWT_SECRET = "Environment variable 'JWT_SECRET' is missing. Please specify the database connection string in your .env file.",
 }
 
 
@@ -88,5 +101,17 @@ function validateEnvironment(env: any) {
   
   if (!env.MONGO_URI || !env.MONGO_URI.trim()) {
     throw new ConfigError(ValidationErrors.MISSING_MONGO_URI);
+  }
+
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_ID.trim()) {
+    throw new ConfigError(ValidationErrors.MISSING_GOOGLE_CLIENT_ID);
+  }
+
+  if (!env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_CLIENT_SECRET.trim()) {
+    throw new ConfigError(ValidationErrors.MISSING_GOOGLE_CLIENT_SECRET);
+  }
+
+  if (!env.JWT_SECRET || !env.JWT_SECRET.trim()) {
+    throw new ConfigError(ValidationErrors.MISSING_JWT_SECRET);
   }
 }

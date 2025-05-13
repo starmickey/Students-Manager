@@ -5,11 +5,13 @@
 export class Environment {
   static instance: Environment;
   serverURI: string;
+  language: string;
 
   private constructor() {
     validateEnvironment(process.env);
 
     this.serverURI = process.env.SERVER_URI || "";
+    this.language = "en";
   }
 
   /**
@@ -24,6 +26,10 @@ export class Environment {
     }
 
     return Environment.instance;
+  }
+
+  static setLanguage(language: string) {
+    Environment.instance.language = language;
   }
 }
 
@@ -46,4 +52,8 @@ function validateEnvironment(env: any) {
   if (!env.SERVER_URI || !env.SERVER_URI.trim()) {
     throw new Error(ValidationErrors.MISSING_SERVER_URI);
   }
+}
+
+export function getSignInPath () {
+  return process.env.NEXT_PUBLIC_AUTH_PATH || "";
 }

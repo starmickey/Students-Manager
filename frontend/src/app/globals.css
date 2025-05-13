@@ -9,6 +9,7 @@
   --yellow-3: #faeecc;
   --yellow-7: #FFDF86;
   --yellow-10: #FCC737;
+  --yellow-12: #E6AB0A;
   --white: white;
 
   --color-bg-overlay: var(--yellow-10);
@@ -151,3 +152,32 @@ a:hover {
   background-color: var(--comp-color-primary-bg-hover);
 }
 
+/* SIDEBAR */
+
+.sidebar {
+  background-color: var(--color-bg-overlay);
+  height: 100vh;
+  padding: 15px;
+  width: 15rem;
+}
+.sidebar-element {
+  padding: 5px;
+}
+.sidebar-element:hover {
+  background-color: #F26B0F50;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+.sidebar-element a {
+  color: black;
+}
+
+body:has(.sidebar) {
+  display: flex;
+}
+
+body:has(.sidebar) main {
+  height: 100vh;
+  overflow: auto;
+  padding: 15px;
+}
