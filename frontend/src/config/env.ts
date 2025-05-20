@@ -29,7 +29,8 @@ export class Environment {
   }
 
   static setLanguage(language: string) {
-    Environment.instance.language = language;
+    const instance = Environment.getInstance();
+    instance.language = language;
   }
 }
 

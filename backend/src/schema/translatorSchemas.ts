@@ -9,19 +9,7 @@ export const createLanguageSchema = z.object({
     .min(1, { message: "'code' field is empty" }),
 });
 
-export const updateLanguageSchema = z.object({
-  id: z
-    .string({ message: "Missing field 'id'" })
-    .min(1, { message: "'id' field is empty" }),
-  name: z
-    .string({ message: "Name must be a string" })
-    .min(1, { message: "'name' field is empty" })
-    .optional(),
-  code: z
-    .string({ message: "Code must be a string" })
-    .min(1, { message: "'code' field is empty" })
-    .optional(),
-});
+export const updateLanguageSchema = createLanguageSchema;
 
 export const createTranslationSchema = z.object({
   word: z

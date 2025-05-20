@@ -2,14 +2,14 @@
 
 :root {
   /* Palette: https://colorhunt.co/palette/fcc737f26b0fe738797e1891 */
-  --gray: #71717A;
-  --pink-10: #E2115E;
-  --pink-12: #BA0045;
-  --red: #F31260;
+  --gray: #71717a;
+  --pink-10: #e2115e;
+  --pink-12: #ba0045;
+  --red: #f31260;
   --yellow-3: #faeecc;
-  --yellow-7: #FFDF86;
-  --yellow-10: #FCC737;
-  --yellow-12: #E6AB0A;
+  --yellow-7: #ffdf86;
+  --yellow-10: #fcc737;
+  --yellow-12: #e6ab0a;
   --white: white;
 
   --color-bg-overlay: var(--yellow-10);
@@ -24,7 +24,6 @@
   --comp-color-primary-bg-hover: var(--pink-12);
   --comp-color-primary-text: var(--white);
 
-  
   /* --secondary: #446072; */
 }
 
@@ -103,7 +102,6 @@ a:hover {
   text-transform: capitalize;
 }
 
-
 /* FORMS */
 
 .input-group .input-group-content {
@@ -164,7 +162,7 @@ a:hover {
   padding: 5px;
 }
 .sidebar-element:hover {
-  background-color: #F26B0F50;
+  background-color: #f26b0f50;
   border-radius: 0.25rem;
   font-weight: bold;
 }
@@ -180,4 +178,33 @@ body:has(.sidebar) main {
   height: 100vh;
   overflow: auto;
   padding: 15px;
+}
+
+/* Tables */
+
+table.minimalistic-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.minimalistic-table th {
+  background-color: var(--yellow-12);
+  color: white;
+}
+
+/* Style for all table cells */
+table.minimalistic-table td,
+table.minimalistic-table th {
+  padding: 8px;
+  border: 1px solid var(--yellow-3);
+}
+
+/* Even columns (2nd, 4th, etc.) */
+table.minimalistic-table tbody tr:nth-child(even) {
+  background-color: var(--yellow-7);
+}
+
+/* Odd columns (1st, 3rd, etc.) */
+table.minimalistic-table tbody tr:nth-child(odd) {
+  background-color: var(--yellow-10);
 }

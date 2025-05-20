@@ -23,7 +23,7 @@ export function getRoutes() {
   router.use("/auth", getSecurityRoutes());
   router.use("/control", getControlRoutes());
   router.use("/translate", getTranslateRoutes());
-  router.use("/language", getLanguageRoutes());
+  router.use("/languages", getLanguageRoutes());
 
   // Set Not Found error response
   router.use("/", (req: Request, res: Response) => {

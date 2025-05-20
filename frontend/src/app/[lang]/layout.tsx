@@ -6,8 +6,7 @@ export default async function Layout({
 }: Readonly<{
   params: Promise<{ lang: string }>;
   children: React.ReactNode;
-}>)
-{
+}>) {
   const { lang } = await params;
   Environment.setLanguage(lang);
 
