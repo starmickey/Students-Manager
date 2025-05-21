@@ -3,6 +3,7 @@
 :root {
   /* Palette: https://colorhunt.co/palette/fcc737f26b0fe738797e1891 */
   --gray: #71717a;
+  --pink-8: #e53b7a;
   --pink-10: #e2115e;
   --pink-12: #ba0045;
   --red: #f31260;
@@ -10,6 +11,7 @@
   --yellow-7: #ffdf86;
   --yellow-10: #fcc737;
   --yellow-12: #e6ab0a;
+  --yellow-14: #d49c00;
   --white: white;
 
   --color-bg-overlay: var(--yellow-10);
@@ -23,8 +25,13 @@
   --comp-color-primary-bg: var(--pink-10);
   --comp-color-primary-bg-hover: var(--pink-12);
   --comp-color-primary-text: var(--white);
+  --comp-color-secondary-bg: var(--yellow-12);
+  --comp-color-secondary-bg-hover: var(--yellow-14);
+  --comp-color-secondary-text: var(--white);
 
-  /* --secondary: #446072; */
+  --font-size-xl: 2rem;
+  --font-size-base: 1rem;
+  --font-size-sm: 0.75rem;
 }
 
 @theme inline {
@@ -33,7 +40,6 @@
   --color-primary: var(--comp-color-primary-bg);
   --color-danger: var(--color-text-danger);
   --color-muted: var(--color-text-muted);
-  /* --color-secondary: var(--secondary); */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -49,7 +55,21 @@ body {
   background: var(--color-bg-base);
   color: var(--color-text-base);
   font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--font-size-base);
 }
+
+/*************************************************/
+/*           HTML SOURCE ELEMENTS                */
+/*************************************************/
+
+/* Titles */
+
+h1 {
+  font-size: var(--font-size-xl);
+  margin-bottom: 0.25rem;
+}
+
+/* Anchor */
 
 a {
   color: var(--comp-color-primary-bg);
@@ -58,13 +78,11 @@ a:hover {
   color: var(--comp-color-primary-bg-hover);
 }
 
-/* DISPLAYS */
+/*************************************************/
+/*                    DISPLAYS                   */
+/*************************************************/
 
-.img-overlay {
-  height: 100vh;
-  position: absolute;
-  width: 100vw;
-}
+/* Floating box */
 
 .floating-box-overlay {
   align-items: center;
@@ -102,7 +120,11 @@ a:hover {
   text-transform: capitalize;
 }
 
-/* FORMS */
+/*************************************************/
+/*                    FORMS                      */
+/*************************************************/
+
+/* Input group */
 
 .input-group .input-group-content {
   background-color: var(--yellow-3);
@@ -137,74 +159,114 @@ a:hover {
   color: var(--color-text-muted);
 }
 
-.button {
+/* Button */
+
+.button-base {
   border-radius: 0.5rem;
+  font-size: var(--font-size-base);
   padding: 0.5rem;
+}
+
+.button-small {
+  border-radius: 0.3rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .button-primary {
   color: var(--comp-color-primary-text);
   background-color: var(--comp-color-primary-bg);
 }
-.button-primary:hover {
+.button-primary:hover:not(:disabled) {
   background-color: var(--comp-color-primary-bg-hover);
 }
+.button-primary:disabled {
+  background-color: var(--gray);
+}
+.button-primary-outline {
+  color: var(--comp-color-primary-bg);
+  border: 1px solid var(--comp-color-primary-bg);
+}
+.button-primary-outline:hover:not(:disabled) {
+  color: var(--comp-color-primary-text);
+  background-color: var(--comp-color-primary-bg);
+}
+.button-primary-outline:disabled {
+  color: var(--gray);
+  border: 1px solid var(--gray);
+}
+.button-secondary {
+  color: var(--comp-color-secondary-text);
+  background-color: var(--comp-color-secondary-bg);
+}
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--comp-color-secondary-bg-hover);
+}
+.button-secondary:disabled {
+  background-color: var(--gray);
+}
+.button-secondary-outline {
+  color: var(--comp-color-secondary-bg-hover);
+  border: 1px solid var(--comp-color-secondary-bg-hover);
+}
+.button-secondary-outline:hover:not(:disabled) {
+  color: var(--comp-color-secondary-text);
+  background-color: var(--comp-color-secondary-bg-hover);
+}
+.button-secondary-outline:disabled {
+  color: var(--gray);
+  border: 1px solid var(--gray);
+}
+.button-secondary-outline[aria-selected="true"] {
+  color: var(--comp-color-secondary-text);
+  background-color: var(--comp-color-secondary-bg);
+}
 
-/* SIDEBAR */
+/*************************************************/
+/*                  NAVBAR                       */
+/*************************************************/
 
-.sidebar {
+.navbar {
   background-color: var(--color-bg-overlay);
-  height: 100vh;
-  padding: 15px;
-  width: 15rem;
+  padding: 10px 20px;
 }
-.sidebar-element {
-  padding: 5px;
-}
-.sidebar-element:hover {
-  background-color: #f26b0f50;
-  border-radius: 0.25rem;
-  font-weight: bold;
-}
-.sidebar-element a {
+.navbar a {
   color: black;
 }
-
-body:has(.sidebar) {
-  display: flex;
+body:has(.navbar) main {
+  padding: 20px;
 }
 
-body:has(.sidebar) main {
-  height: 100vh;
-  overflow: auto;
-  padding: 15px;
-}
+/*************************************************/
+/*                  TABLES                       */
+/*************************************************/
 
-/* Tables */
-
-table.minimalistic-table {
-  border-collapse: collapse;
+.minimalistic-table {
+  border-collapse: separate;
+  border-spacing: 0 3px; /* adds space between rows */
   width: 100%;
 }
 
-table.minimalistic-table th {
+.minimalistic-table td,
+.minimalistic-table th {
+  padding: 3px 12px;
+}
+.minimalistic-table th {
   background-color: var(--yellow-12);
   color: white;
 }
-
-/* Style for all table cells */
-table.minimalistic-table td,
-table.minimalistic-table th {
-  padding: 8px;
-  border: 1px solid var(--yellow-3);
+.minimalistic-table td {
+  background-color: var(--yellow-3);
 }
 
-/* Even columns (2nd, 4th, etc.) */
-table.minimalistic-table tbody tr:nth-child(even) {
-  background-color: var(--yellow-7);
+/* Round only the first and last cell of each row */
+.minimalistic-table tr th:first-child,
+.minimalistic-table tr td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
-/* Odd columns (1st, 3rd, etc.) */
-table.minimalistic-table tbody tr:nth-child(odd) {
-  background-color: var(--yellow-10);
+.minimalistic-table tr th:last-child,
+.minimalistic-table tr td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }

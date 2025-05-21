@@ -5,10 +5,11 @@ import {
   Language,
   Translation,
 } from '../models/translatorModels';
-import {fetchPage, FetchPageProps} from '../utils/apiUtils';
+import {fetchPage, FetchPageProps} from './common';
 
-export const getLanguagesPage = async (props: Omit<FetchPageProps<ILanguage>, 'model'>) =>
-  fetchPage<ILanguage>({model: Language, ...props});
+export const getLanguagesPage = async (
+  props: Omit<FetchPageProps<ILanguage>, 'model'>,
+) => fetchPage<ILanguage>({model: Language, ...props});
 
 export async function createLanguage(
   name: string,
@@ -70,6 +71,6 @@ export async function getTranslation(
   return translatedWord;
 }
 
-export const getTranslationsPage = async (props: Omit<FetchPageProps<ITranslation>, 'model'>) =>
-  fetchPage<ITranslation>({model: Translation, ...props});
-
+export const getTranslationsPage = async (
+  props: Omit<FetchPageProps<ITranslation>, 'model'>,
+) => fetchPage<ITranslation>({model: Translation, ...props});

@@ -32,6 +32,11 @@ export class Environment {
     const instance = Environment.getInstance();
     instance.language = language;
   }
+
+  static getLanguage() {
+    const instance = Environment.getInstance();
+    return instance.language;
+  }
 }
 
 /**
@@ -48,13 +53,12 @@ enum ValidationErrors {
   MISSING_SERVER_URI = "Environment variable 'SERVER_URI' is missing. Please set it to the path to your server in your .env file",
 }
 
-
 function validateEnvironment(env: any) {
   if (!env.SERVER_URI || !env.SERVER_URI.trim()) {
     throw new Error(ValidationErrors.MISSING_SERVER_URI);
   }
 }
 
-export function getSignInPath () {
+export function getSignInPath() {
   return process.env.NEXT_PUBLIC_AUTH_PATH || "";
 }

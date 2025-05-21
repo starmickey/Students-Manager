@@ -1,5 +1,4 @@
 import { getEnvironment } from "@/config/env";
-import { PaginatedData } from "./types";
 
 export interface FetchPageProps {
   api: string;
@@ -9,13 +8,21 @@ export interface FetchPageProps {
   sortOrder?: string;
 }
 
-export async function fetchPage<T>({
+export interface PaginatedData {
+  data: Record<string,string>[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export async function fetchPage({
   api,
   page,
   pageSize,
   sort,
   sortOrder,
-}: FetchPageProps): Promise<PaginatedData<T>> {
+}: FetchPageProps): Promise<PaginatedData> {
   const { serverURI } = getEnvironment();
   const url = new URL(`/${api}`, serverURI);
   if (page) url.searchParams.append("page", page.toString());
@@ -29,5 +36,5 @@ export async function fetchPage<T>({
   }
 
   const jsonResponse = await response.json();
-  return jsonResponse as PaginatedData<T>;
+  return jsonResponse as PaginatedData;
 }

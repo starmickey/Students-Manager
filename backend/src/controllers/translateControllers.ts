@@ -17,6 +17,7 @@ import {
   updateTranslationSchema,
 } from '../schema/translatorSchemas';
 import {paginationSchema} from '../schema/commonSchemas';
+import {flatenTranslation} from '../services/translationServices';
 
 export async function getLanguagesController(req: Request, res: Response) {
   try {
@@ -27,7 +28,6 @@ export async function getLanguagesController(req: Request, res: Response) {
     handleExceptionResponse(res, error);
   }
 }
-
 
 export async function createLanguageController(req: Request, res: Response) {
   try {
@@ -86,12 +86,9 @@ export async function getTranslationsController(req: Request, res: Response) {
   try {
     const {page, pageSize, sort} = paginationSchema.parse(req.query);
     const result = await getTranslationsPage({page, pageSize, sort});
-    res.send(result);
+    const formattedData = result.data.map(entry => flatenTranslation(entry));
+    res.send({...result, data: formattedData});
   } catch (error) {
     handleExceptionResponse(res, error);
   }
 }
-function getLanguagePage(arg0: { page: number; pageSize: number; sort: { [x: string]: "asc" | "desc"; } | undefined; }) {
-  throw new Error('Function not implemented.');
-}
-

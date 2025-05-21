@@ -1,49 +1,36 @@
+import PaginatedDataTable from "@/ui/tables/PaginatedDataTable";
+import { fetchPage, FetchPageProps } from "@/api/common";
 import { TranslatedWordWrapper as T } from "@/ui/TranslatedWord";
-import { fetchLanguagesPage, fetchTranslationsPage } from "@/api/translatorApi";
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-    sort?: string;
-    sortOrder?: string;
-  };
+  searchParams?: Promise<Omit<FetchPageProps, "api">>;
 }) {
-  const { data: words } = await fetchTranslationsPage({
-    ...(searchParams?.page && {
-      page: Number(searchParams?.page) || 1,
-      pageSize: 10,
-    }),
-    sort: searchParams?.sort || "key",
-    sortOrder: searchParams?.sortOrder || "asc",
-  });
+  const params = await searchParams;
 
-  const { data: languages } = await fetchLanguagesPage();
+  const { data: languages } = await fetchPage({ api: "languages" });
+
+  const columns = [
+    {
+      key: "key",
+      name: "Code",
+    },
+    ...languages.map((l) => ({
+      key: l.code,
+      name: l.name,
+    })),
+  ];
 
   return (
-    <table className="minimalistic-table">
-      <thead>
-        <tr>
-          <th><T>Code</T></th>
-          {languages.map((language, index) => (
-            <th key={index} className="capitalize">
-              <T>{language.name}</T>
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {words.map((word, index) => (
-          <tr key={index}>
-            <td><pre>{word.key || ""}</pre></td>
-            {languages.map((language, index) => (
-              <td key={index} className="capitalize">{word.translations?.[language.code] || ""}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <>
+      <h1>
+        <T>Translations</T>
+      </h1>
+      <PaginatedDataTable
+        columns={columns}
+        dataSearchParams={{ ...params, api: "translate" }}
+      />
+    </>
   );
 }

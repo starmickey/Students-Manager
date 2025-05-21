@@ -1,6 +1,5 @@
-import { Model as MongooseModel, SortOrder } from 'mongoose';
-import { PaginatedData } from '../types/pagintation';
-import { BadRequest } from '../config/exceptions';
+import {Model as MongooseModel, SortOrder} from 'mongoose';
+import {BadRequest} from '../config/exceptions';
 
 export interface FetchPageProps<T> {
   model: MongooseModel<T>;
@@ -8,9 +7,17 @@ export interface FetchPageProps<T> {
   pageSize?: number;
   sort?:
     | string
-    | { [key: string]: SortOrder | { $meta: any } }
+    | {[key: string]: SortOrder | {$meta: any}}
     | [string, SortOrder][]
     | null;
+}
+
+export interface Page<T> {
+  data: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }
 
 export async function fetchPage<T>({
@@ -18,7 +25,7 @@ export async function fetchPage<T>({
   pageSize,
   model,
   sort,
-}: FetchPageProps<T>): Promise<PaginatedData<T>> {
+}: FetchPageProps<T>): Promise<Page<T>> {
   if ((page && page <= 0) || (pageSize && pageSize <= 0)) {
     throw new BadRequest('Page and pageSize must be positive integers');
   }

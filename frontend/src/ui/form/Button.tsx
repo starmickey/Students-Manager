@@ -1,19 +1,28 @@
-import React from "react";
+import { ButtonHTMLAttributes } from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: "primary";
+export type ButtonVariant =
+  | "primary"
+  | "primary-outline"
+  | "secondary"
+  | "secondary-outline";
+export type ButtonSize = "base" | "small";
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
 const Button: React.FC<ButtonProps> = ({
   children,
   className,
   variant = "primary",
+  size = "base",
   ...rest
 }) => {
   return (
     <button
-    className={`button button-${variant} ${className}`}
-    {...rest}
+      className={`button button-${variant} button-${size} ${className}`}
+      {...rest}
     >
       {children}
     </button>
