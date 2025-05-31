@@ -1,19 +1,57 @@
 import { ReactNode } from "react";
 
-interface FloatingBoxProps {
-  children: ReactNode,
-  imgSrc?: string,
-  size?: "small",
-};
+export interface FloatingBoxProps {
+  id?: string;
+  children: ReactNode;
+  imgSrc?: string;
+  size?: "small";
+  backgroundColor?: string;
+  onOverlayClick?: () => void;
+  isDialog?: boolean;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
+}
 
-export default function FloatingBox({ children, imgSrc, size }: FloatingBoxProps) {
+export default function FloatingBox({
+  id,
+  children,
+  imgSrc,
+  size,
+  backgroundColor,
+  onOverlayClick = () => {},
+  isDialog = false,
+  ariaLabelledBy,
+  ariaDescribedBy,
+}: FloatingBoxProps) {
+  const overlayStyle: React.CSSProperties = {
+    ...(imgSrc
+      ? { backgroundImage: `url("${imgSrc}")` }
+      : backgroundColor && { backgroundColor }),
+  };
+
+  const handleOverlayClick = () => {
+    onOverlayClick?.();
+  };
+
   return (
-    <div>
-      <div className="floating-box-overlay" style={{ backgroundImage: `url("${imgSrc}")`}}>
-        <div className={`floating-box ${size ? `floating-box-${size}` : ""}`}>
+    <div {...(id && { id })}>
+      <div
+        className="floating-box-overlay"
+        onClick={handleOverlayClick}
+        style={overlayStyle}
+        role="presentation"
+      >
+        <div
+          className={`floating-box ${size ? `floating-box-${size}` : ""}`}
+          onClick={(e) => e.stopPropagation()}
+          role={!isDialog ? "dialog" : undefined}
+          aria-modal={!isDialog ? "true" : undefined}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+        >
           {children}
         </div>
       </div>
     </div>
-  )
+  );
 }
