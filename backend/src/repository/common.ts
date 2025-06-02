@@ -1,6 +1,21 @@
 import {Model as MongooseModel, SortOrder} from 'mongoose';
 import {BadRequest} from '../config/exceptions';
 
+/**
+ * FetchPageProps<T>
+ * 
+ * Interface defining parameters for paginated data fetching.
+ * 
+ * Properties:
+ *  - model: Mongoose model representing the collection to query.
+ *  - page: Optional page number (1-based).
+ *  - pageSize: Optional number of items per page.
+ *  - sort: Optional sorting criteria. Can be:
+ *      - string (field name),
+ *      - object mapping field names to SortOrder or $meta,
+ *      - array of [field, SortOrder] tuples,
+ *      - or null to disable sorting.
+ */
 export interface FetchPageProps<T> {
   model: MongooseModel<T>;
   page?: number;
@@ -12,6 +27,18 @@ export interface FetchPageProps<T> {
     | null;
 }
 
+/**
+ * Page<T>
+ * 
+ * Interface defining the structure of a paginated response.
+ * 
+ * Properties:
+ *  - data: Array of fetched documents of type T.
+ *  - page: Current page number.
+ *  - pageSize: Number of items per page.
+ *  - total: Total number of documents in the collection.
+ *  - totalPages: Total number of pages available.
+ */
 export interface Page<T> {
   data: T[];
   page: number;
@@ -20,6 +47,23 @@ export interface Page<T> {
   totalPages: number;
 }
 
+/**
+ * fetchPage<T>
+ * 
+ * Fetches a paginated and optionally sorted page of documents from a MongoDB collection using Mongoose.
+ * 
+ * Behavior:
+ *  - Validates that page and pageSize, if provided, are positive integers.
+ *  - Calculates total documents and total pages.
+ *  - Throws BadRequest error if page exceeds available pages.
+ *  - Applies skip and limit for pagination.
+ *  - Applies sorting if provided.
+ * 
+ * @param props - Object containing fetch options (model, page, pageSize, sort).
+ * @returns Promise resolving to a Page<T> object containing paginated data and metadata.
+ * 
+ * @throws BadRequest if invalid page/pageSize or page exceeds available pages.
+ */
 export async function fetchPage<T>({
   page,
   pageSize,
@@ -33,7 +77,7 @@ export async function fetchPage<T>({
   const total = await model.countDocuments();
   let query = model.find();
 
-  // Pagination logic
+  // Pagination defaults
   let skip = 0;
   let limit = total;
   let currentPage = 1;
@@ -55,7 +99,7 @@ export async function fetchPage<T>({
     query = query.skip(skip).limit(limit);
   }
 
-  // Apply sorting only if sort is defined
+  // Apply sorting if provided
   if (sort) {
     query = query.sort(sort);
   }

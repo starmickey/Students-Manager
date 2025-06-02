@@ -1,12 +1,14 @@
-import { Model, model, Query, Schema } from "mongoose";
+import { Model, model, Query, Schema, Document } from "mongoose";
 import { BadRequest } from "../config/exceptions";
 
 /**
- * LANGUAGE
+ * LANGUAGE MODEL
+ * 
+ * Stores available languages for the application.
  * 
  * Attributes:
- *    - name: Full language name in English. E.g. spanish, english
- *    - code: Language identifier. Has two characters. E.g. es, en
+ *   - name: Full language name in English (e.g., "english", "spanish")
+ *   - code: Two-letter ISO language code (e.g., "en", "es")
  */
 
 // Language Interface
@@ -33,15 +35,16 @@ const languageSchema = new Schema({
 });
 
 /**
- * TRANSLATIONS
+ * TRANSLATION MODEL
+ * 
+ * Stores translations for interface strings.
  * 
  * Attributes:
- *    - key: Univocal word or phrase in English in lower case used to fetch the translation.
- *    - translations: Map that stores all of the possible translations. Its entries have this structure:
- *          { "translationCode": "translation" }
+ *   - key: Unique string identifier in lowercase English (e.g., "hello", "student_list")
+ *   - translations: A map of translations for each language code, e.g., { "en": "Hello", "es": "Hola" }
  */
 
-// Translation interface
+// Translation Interface
 interface ITranslation extends Document {
   key: string;
   translations: Map<string, string>;
@@ -58,32 +61,42 @@ const translationSchema = new Schema({
   },
   translations: {
     type: Map,
-    of: String, // Stores translations per language (e.g., { 'en': 'Hello', 'es': 'Hola' })
+    of: String,
     required: true,
   }
 });
 
-// Pre-save hook
+/**
+ * Pre-save hook to sanitize and validate the `translations` map and normalize the key.
+ * 
+ * @function
+ * @param {Function} next - Mongoose middleware continuation function
+ */
 translationSchema.pre<ITranslation>("save", async function (next) {
-  // Validate and normalize fields
-  this.translations = await parseTranslations(this.translations.entries())
+  // Parse and validate translations (e.g., validate language codes)
+  this.translations = await parseTranslations(this.translations.entries());
 
-  // Cast translation key to lower case
+  // Normalize key to lowercase
   this.key = this.key.trim().toLowerCase();
 
   next();
 });
 
-// Pre-update hook
+/**
+ * Pre-update hook for `findOneAndUpdate` to validate translation keys and normalize the key.
+ * 
+ * @function
+ * @param {Function} next - Mongoose middleware continuation function
+ */
 translationSchema.pre<Query<ITranslation, ITranslation>>("findOneAndUpdate", async function (next) {
-  const update = this.getUpdate() as any; 
+  const update = this.getUpdate() as any;
 
-  // If translations is not part of the update object, just proceed
+  // If no translations are updated, skip validation
   if (!update.translations) {
     return next();
   }
 
-  // Validate that keys are valid languages
+  // Validate that each language key in the update exists
   for (const key of Object.keys(update.translations)) {
     const lang = await Language.findOne({ code: key });
     if (!lang) {
@@ -91,37 +104,50 @@ translationSchema.pre<Query<ITranslation, ITranslation>>("findOneAndUpdate", asy
     }
   }
 
-  // Ensure key is lowercase if it's being updated
+  // Normalize the key if it's present in the update
   if (update.key) {
     update.key = update.key.trim().toLowerCase();
   }
 
-  // Apply modifications back to the update object
+  // Apply the updated object back to the query
   this.setUpdate(update);
 
   next();
 });
 
-async function parseTranslations(translations: MapIterator<[string, string]>) {
+/**
+ * Parses and validates a MapIterator of translations.
+ * Ensures that all language keys exist and converts keys to lowercase.
+ * 
+ * @function parseTranslations
+ * @param {MapIterator<[string, string]>} translations - Map iterator containing language keys and translated values
+ * @returns {Promise<Map<string, string>>} A validated and normalized translations map
+ * 
+ * @example
+ * const parsed = await parseTranslations([['en', 'Hello'], ['es', 'Hola']].entries())
+ */
+async function parseTranslations(translations: MapIterator<[string, string]>): Promise<Map<string, string>> {
   const formattedTranslations = new Map<string, string>();
 
   for (const [key, value] of translations) {
-    // Validate that key is a valid language code
+    // Ensure the language code exists
     const lang = await Language.findOne({ code: key });
     if (!lang) {
       throw new BadRequest(`${key} is not a valid language code`);
     }
 
-    // Cast translation keys to lowercase
+    // Store translation with lowercase language code
     formattedTranslations.set(key.toLowerCase(), value);
   }
 
   return formattedTranslations;
 }
 
+// Mongoose Models
 const Language: Model<ILanguage> = model<ILanguage>("Language", languageSchema);
 const Translation: Model<ITranslation> = model<ITranslation>("Translation", translationSchema);
 
+// Export interfaces and models
 export {
   ILanguage,
   ITranslation,

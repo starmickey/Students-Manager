@@ -1,9 +1,16 @@
 import { Request, Response, Router } from "express";
 
 /**
- * Routes used for checking the server status
+ * Control Routes
  * 
- * @returns an Express Router
+ * Defines routes used for basic server health checks and status monitoring.
+ * 
+ * Routes:
+ *  - GET /status
+ *    - Purpose: Check if the server is running.
+ *    - Response: Sends a plain text message "I am running".
+ * 
+ * @returns {Router} An Express Router configured with control routes.
  */
 export function getControlRoutes() {
 

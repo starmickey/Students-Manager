@@ -7,26 +7,36 @@ import {PassportMiddleware} from './middleware/passport';
 import {Environment} from './config/env';
 
 /**
- * Starts an Express application
- *
- * @param port the port where the app will run.
+ * Initializes and starts an Express application server.
+ * 
+ * This function sets up middleware for CORS, body parsing, and authentication,
+ * mounts the application routes, and begins listening on the specified port.
+ * 
+ * @param {Environment} params - Configuration parameters
+ * @param {object} params.googleCredentials - OAuth credentials required for Google authentication
+ * @param {string} params.googleCredentials.clientID - Google OAuth client ID
+ * @param {string} params.googleCredentials.clientSecret - Google OAuth client secret
+ * @param {number} params.port - Port number on which the Express server will listen
+ * 
+ * @returns {void}
  */
 export function initExpress({googleCredentials, port}: Environment) {
   const app = express();
   const logger = getLogger();
 
-  
-  // Enable cors policy
+  // Enable CORS for cross-origin requests
   app.use(cors());
   
-  // Enable authentication
+  // Initialize Google OAuth authentication middleware
   PassportMiddleware.init({googleCredentials});
 
-  // parse application/json body
+  // Enable JSON body parsing for incoming requests
   app.use(bodyParser.json());
 
+  // Mount all application routes
   app.use(getRoutes());
 
+  // Start the server listening on the specified port
   app.listen(port, () => {
     logger.info(`Server running on port ${port}.`);
   });
