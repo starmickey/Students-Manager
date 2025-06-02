@@ -14,7 +14,8 @@ import FloatingBox, { FloatingBoxProps } from "./FloatingBox";
  * Props for the DialogWrapper component
  */
 interface DialogWrapperProps {
-  isOpen?: boolean;
+  startOpen?: boolean;
+  forceCloseIdx?: number; // Change its number to force close
   onClose?: () => void;
   trigger: ReactNode;
   dialog: ReactNode;
@@ -25,24 +26,27 @@ interface DialogWrapperProps {
  * DialogWrapper manages the open/close logic, overlay click, and ESC key behavior
  */
 export default function DialogWrapper({
-  isOpen = false,
+  startOpen = false,
+  forceCloseIdx = 0,
   onClose,
   trigger,
   dialog,
   lockBackground = true,
 }: DialogWrapperProps) {
-  const [open, setOpen] = useState(isOpen);
+  const [open, setOpen] = useState(startOpen);
 
   // Assign a unique ID for stacking dialog layers
-  const dialogId = `dialog-${getDialogsCount() + 1}`;
+  const [dialogId, setDialogId] = useState<string>("");
 
-  // Synchronize internal state with external `isOpen` prop
   useEffect(() => {
-    setOpen(isOpen);
-    if (!isOpen) {
-      onClose?.();
+    setDialogId(`dialog-${getDialogsCount() + 1}`);
+  }, []);
+
+  useEffect(() => {
+    if (forceCloseIdx > 0) {
+      handleClose();
     }
-  }, [isOpen]);
+  }, [forceCloseIdx]);
 
   // Close dialog on ESC key if it is the top-most
   useEffect(() => {
@@ -129,11 +133,11 @@ export function Dialog({
 
   return (
     <FloatingBox isDialog={true} {...floatingBoxAttributes}>
-      <div className="flex justify-end">
+      {/* <div className="flex justify-end w-full">
         <button onClick={onClose} aria-label="Close dialog">
           ✕
         </button>
-      </div>
+      </div> */}
       {children}
     </FloatingBox>
   );
@@ -147,5 +151,8 @@ export function Modal(props: Omit<DialogProps, "lockBackground">) {
  * Returns the number of currently rendered dialogs (based on ID prefix)
  */
 function getDialogsCount(): number {
+  if (typeof document === "undefined") {
+    return 0;
+  }
   return document.querySelectorAll("[id^='dialog']").length;
 }

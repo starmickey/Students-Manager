@@ -5,13 +5,11 @@
 export class Environment {
   static instance: Environment;
   serverURI: string;
-  language: string;
 
   private constructor() {
     validateEnvironment(process.env);
 
     this.serverURI = process.env.SERVER_URI || "";
-    this.language = "en";
   }
 
   /**
@@ -26,16 +24,6 @@ export class Environment {
     }
 
     return Environment.instance;
-  }
-
-  static setLanguage(language: string) {
-    const instance = Environment.getInstance();
-    instance.language = language;
-  }
-
-  static getLanguage() {
-    const instance = Environment.getInstance();
-    return instance.language;
   }
 }
 

@@ -1,22 +1,13 @@
-
 "use client";
 
-export default function GoogleSignInCardContent({
-  // redirectPath,
-  backendAuthPath,
-  label,
-}: {
-  // redirectPath: string;
-  backendAuthPath: string;
-  label: string;
-}) {
+import T from "@/ui/TranslatedWord";
 
+export default function GoogleSignInCardContent({
+  backendAuthPath,
+}: {
+  backendAuthPath: string;
+}) {
   const handleClick = () => {
-    // const returnTo = encodeURIComponent(
-    //   `${window.location.origin}/${redirectPath}`
-    // );
-    // alert(`${backendAuthPath}?returnTo=${returnTo}`)
-    // window.location.href = `${backendAuthPath}?returnTo=${returnTo}`;
     window.location.href = backendAuthPath;
   };
 
@@ -32,7 +23,9 @@ export default function GoogleSignInCardContent({
         loading="lazy"
         alt="google logo"
       />
-      <span>{label}</span>
+      <span>
+        <T>Log in with Google</T>
+      </span>
     </button>
   );
 }

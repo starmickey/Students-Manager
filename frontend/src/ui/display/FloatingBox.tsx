@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode } from "react";
 
 export interface FloatingBoxProps {
@@ -49,7 +51,7 @@ export default function FloatingBox({
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
         >
-          {children}
+          <div className="floating-box-content">{children}</div>
         </div>
       </div>
     </div>

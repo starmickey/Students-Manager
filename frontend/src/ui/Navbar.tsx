@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TranslatedWordWrapper as T } from "./TranslatedWord";
+import T from "./TranslatedWord";
 
 interface NavLink {
   label: string;
@@ -14,17 +14,13 @@ const navLinks: NavLink[] = [
   },
 ];
 
-interface NavbarProps {
-  lang: string;
-}
-
-export default function Navbar({ lang }: NavbarProps) {
+export default function Navbar() {
   return (
     <nav className="navbar">
       <ul>
         {navLinks.map((n, key) => (
           <li key={key}>
-            <Link href={ `/${lang}/${n.href}`} title={n.title}>
+            <Link href={`/${n.href}`} title={n.title}>
               <T>{n.label}</T>
             </Link>
           </li>

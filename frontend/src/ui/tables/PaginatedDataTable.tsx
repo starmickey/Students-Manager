@@ -1,6 +1,5 @@
-import { TranslatedWordWrapper as T } from "@/ui/TranslatedWord";
-import { fetchPage, FetchPageProps } from "@/api/common";
-import Button from "../form/Button";
+import T from "@/ui/TranslatedWord";
+import { fetchPage, FetchPageProps } from "@/services/paginator";
 import Pagination from "./Pagination";
 
 interface PaginatedDataTableProps {
@@ -15,7 +14,7 @@ export default async function PaginatedDataTable({
   dataSearchParams,
   columns,
 }: PaginatedDataTableProps) {
-  const { data, page, totalPages } = await fetchPage(
+  const { data, page, totalPages } = await fetchPage<Record<string,string>>(
     dataSearchParams
   );
 

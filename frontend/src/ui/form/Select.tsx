@@ -2,7 +2,7 @@
 
 import T from "../TranslatedWord";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   id: string;
   label: string;
   variant: "primary";
@@ -10,15 +10,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string;
 }
 
-export default function Input({
+export default function Select({
   id,
   label,
-  placeholder,
   isRequired,
   errorMessage,
   variant,
-  ...inputProps
-}: InputProps) {
+  ...selectProps
+}: SelectProps) {
   return (
     <div className={`input-group input-group-${variant}`}>
       <div className="input-group-content">
@@ -26,11 +25,11 @@ export default function Input({
           <T>{label}</T>
           {isRequired && <span className="text-danger">*</span>}
         </label>
-        <input id={id} required={isRequired} {...inputProps} />
+        <select id={id} name={id} required={isRequired} {...selectProps}/>
       </div>
 
       {errorMessage && (
-        <div className="input-error">
+        <div className="text-danger">
           <T>{errorMessage}</T>
         </div>
       )}

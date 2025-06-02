@@ -78,6 +78,44 @@ a:hover {
   color: var(--comp-color-primary-bg-hover);
 }
 
+:root {
+  --yellow-3: #faeecc;
+  --yellow-7: #ffdf86;
+  --yellow-10: #fcc737;
+  --yellow-12: #e6ab0a;
+  --yellow-14: #d49c00;
+}
+
+/* Webkit-based browsers */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Let outline show through */
+  border-radius: 999px;
+  margin: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--yellow-10);
+  border: 2px solid var(--yellow-3); /* Outline effect */
+  border-radius: 999px;
+  transition: background-color 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--yellow-14);
+  border-color: var(--yellow-7);
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--yellow-10) transparent;
+}
+
 /*************************************************/
 /*                    DISPLAYS                   */
 /*************************************************/
@@ -95,6 +133,7 @@ a:hover {
   right: 0;
   bottom: 0;
   width: 100vw;
+  padding: 20px;
   /* z-index: 10; */
 }
 
@@ -106,8 +145,14 @@ a:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px;
+  padding: 40px 10px;
   z-index: 100;
+}
+
+.floating-box-content {
+  max-height: 80vh;
+  overflow: auto;
+  padding: 0 30px;
 }
 
 .floating-box-small {
@@ -124,6 +169,24 @@ a:hover {
   text-transform: capitalize;
 }
 
+/*************************************************/
+/*                 WORD SKELETON                 */
+/*************************************************/
+
+.word-skeleton-container {
+  display: inline-block;
+}
+.word-skeleton {
+  background-color: #ffffffa0;
+  border-radius: 10px;
+  display: inline-block;
+  height: var(--font-size-base);
+  width: 8rem;
+}
+
+h1 .word-skeleton {
+  height: var(--font-size-xl)
+}
 /*************************************************/
 /*                    FORMS                      */
 /*************************************************/
@@ -142,11 +205,14 @@ a:hover {
   box-shadow: 0 0 8px var(--comp-color-primary-bg); /* Glowing effect */
 }
 
-.input-group .input-group-content input {
+.input-group .input-group-content input,
+.input-group .input-group-content select {
   width: 100%;
 }
 .input-group .input-group-content input:focus,
-.input-group .input-group-content input:-webkit-autofill {
+.input-group .input-group-content input:-webkit-autofill,
+.input-group .input-group-content select:focus,
+.input-group .input-group-content select:-webkit-autofill {
   background-color: transparent;
   outline: none;
   box-shadow: none;
@@ -157,18 +223,35 @@ a:hover {
   text-transform: capitalize;
   width: 100%;
 }
+.input-group label .word-skeleton {
+  height: 0.75rem;
+  width: 4rem;
+}
 
 .input-group input::-webkit-input-placeholder {
   background-color: transparent;
   color: var(--color-text-muted);
 }
 
+.input-error {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin: 0 6px;
+}
+
 /* Button */
 
 .button-base {
+  align-items: center;
   border-radius: 0.5rem;
+  display: flex;
   font-size: var(--font-size-base);
+  justify-content: center;
   padding: 0.5rem;
+  text-align: center;
+}
+.button-base .word-skeleton {
+  width: 2rem;
 }
 
 .button-small {
@@ -192,7 +275,8 @@ a:hover {
 }
 .button-primary-outline:hover:not(:disabled) {
   color: var(--comp-color-primary-text);
-  background-color: var(--comp-color-primary-bg);
+  background-color: var(--comp-color-primary-bg-hover);
+  border: 1px solid var(--comp-color-primary-bg-hover);
 }
 .button-primary-outline:disabled {
   color: var(--gray);
