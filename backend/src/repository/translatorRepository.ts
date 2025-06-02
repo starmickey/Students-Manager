@@ -1,42 +1,53 @@
-import { getLogger } from '../config/logger';
+import {BadRequest} from '../config/exceptions';
+import {getLogger} from '../config/logger';
 import {
   ILanguage,
   ITranslation,
   Language,
   Translation,
 } from '../models/translatorModels';
-import { fetchPage, FetchPageProps } from './common';
+import {fetchPage, FetchPageProps} from './common';
 
 /**
  * Fetches a paginated list of languages.
- * 
+ *
  * @function getLanguagesPage
  * @param {Omit<FetchPageProps<ILanguage>, 'model'>} props - Pagination and filter options
  * @returns {Promise<PaginatedResult<ILanguage>>} List of languages matching the query
  */
 export const getLanguagesPage = async (
   props: Omit<FetchPageProps<ILanguage>, 'model'>,
-) => fetchPage<ILanguage>({ model: Language, ...props });
+) => fetchPage<ILanguage>({model: Language, ...props});
 
 /**
  * Creates a new language entry.
- * 
+ *
  * @function createLanguage
  * @param {string} name - Full name of the language (e.g., "English")
  * @param {string} code - Two-letter language code (e.g., "en")
  * @returns {Promise<ILanguage | null>} The created language document or null on failure
+ * @throws {BadRequest} on duplicated name entry
  */
 export async function createLanguage(
   name: string,
   code: string,
 ): Promise<ILanguage | null> {
-  const language = new Language({ name, code });
-  return await language.save();
+  try {
+    const language = new Language({name, code});
+    return await language.save();
+  } catch (err: any) {
+    if (err.code === 11000) {
+      throw new BadRequest('This language already exists');
+    }
+
+    // Re-throw other errors
+    throw err;
+  }
 }
 
 /**
  * Updates the name of an existing language identified by its code.
- * 
+ *
  * @function updateLanguage
  * @param {string} code - Two-letter language code
  * @param {string} [name] - New name to assign
@@ -47,32 +58,42 @@ export async function updateLanguage(
   name?: string,
 ): Promise<ILanguage | null> {
   const updatedLanguage = await Language.findOneAndUpdate(
-    { code },
-    { name },
-    { new: true, runValidators: true },
+    {code},
+    {name},
+    {new: true, runValidators: true},
   );
   return updatedLanguage;
 }
 
 /**
  * Creates a new translation entry.
- * 
+ *
  * @function createTranslation
  * @param {string} key - Identifier for the word or phrase (in lowercase English)
  * @param {Record<string, string>} translations - Object mapping language codes to translations
  * @returns {Promise<ITranslation>} The created translation document
+ * @throws {BadRequest} on duplicated key entry
  */
 export async function createTranslation(
   key: string,
   translations: Record<string, string>,
 ): Promise<ITranslation> {
-  const translation = new Translation({ key, translations });
-  return await translation.save();
+  try {
+    const translation = new Translation({key, translations});
+    return await translation.save();
+  } catch (err: any) {
+    if (err.code === 11000) {
+      throw new BadRequest('A translation for this word already exists');
+    }
+
+    // Re-throw other errors
+    throw err;
+  }
 }
 
 /**
  * Updates an existing translation entry.
- * 
+ *
  * @function updateTranslation
  * @param {string} key - Translation key to update
  * @param {Record<string, string>} translations - Updated set of translations
@@ -83,9 +104,9 @@ export async function updateTranslation(
   translations: Record<string, string>,
 ): Promise<ITranslation | null> {
   const updatedTranslation = await Translation.findOneAndUpdate(
-    { key },
-    { translations },
-    { new: true, runValidators: true },
+    {key},
+    {translations},
+    {new: true, runValidators: true},
   );
   return updatedTranslation;
 }
@@ -93,7 +114,7 @@ export async function updateTranslation(
 /**
  * Retrieves the translated word for a given key and language.
  * If the translation is missing, it logs a warning and returns the original key.
- * 
+ *
  * @function getTranslation
  * @param {string} key - The translation key (in lowercase English)
  * @param {string} languageCode - Two-letter language code (e.g., "es")
@@ -106,7 +127,7 @@ export async function getTranslation(
   const logger = getLogger();
 
   const normalizedKey = key.toLowerCase().trim();
-  const translation = await Translation.findOne({ key: normalizedKey });
+  const translation = await Translation.findOne({key: normalizedKey});
   const translatedWord = translation?.translations.get(languageCode);
 
   if (!translation || !translatedWord) {
@@ -121,11 +142,11 @@ export async function getTranslation(
 
 /**
  * Fetches a paginated list of translations.
- * 
+ *
  * @function getTranslationsPage
  * @param {Omit<FetchPageProps<ITranslation>, 'model'>} props - Pagination and filter options
  * @returns {Promise<PaginatedResult<ITranslation>>} List of translations matching the query
  */
 export const getTranslationsPage = async (
   props: Omit<FetchPageProps<ITranslation>, 'model'>,
-) => fetchPage<ITranslation>({ model: Translation, ...props });
+) => fetchPage<ITranslation>({model: Translation, ...props});
