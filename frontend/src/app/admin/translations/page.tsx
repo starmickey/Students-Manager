@@ -73,30 +73,28 @@ export default async function Page({
   }));
 
   return (
-    <>
+    <div className="admin-view">
       {/* Page header */}
-      <section className="flex justify-between flex-wrap items-start">
-        <h1 className="flex-1 text-2xl font-bold">
+      <section className="admin-view-header">
+        <h1 className="page-title">
           <T>Translations</T>
         </h1>
 
         {/* Modal button to create a new translation */}
         {languages.data.length > 0 && (
-          <div className="flex flex-wrap gap-4 items-center">
-            <AMTranslationModal
-              action="create"
-              languages={languages.data}
-              trigger={
-                <Button title="Create translation">
-                  <T>New</T>
-                </Button>
-              }
-            />
-          </div>
+          <AMTranslationModal
+            action="create"
+            languages={languages.data}
+            trigger={
+              <Button title="Create translation">
+                <T>New</T>
+              </Button>
+            }
+          />
         )}
       </section>
 
-      <section className="mt-4">
+      <section>
         {languages.data.length > 0 && translations.data.length > 0 ? (
           // Data table showing all translations with pagination
           <PaginatedDataTable
@@ -106,17 +104,11 @@ export default async function Page({
             totalPages={translations.totalPages}
           />
         ) : languages.data.length > 0 ? (
-          <div>
-            <T>No translations</T>
-          </div>
+          <T>No translations</T>
         ) : (
-          <div>
-            <T>
-              No languages created, please create one to create translations.
-            </T>
-          </div>
+          <T>No languages created, please create one to create translations.</T>
         )}
       </section>
-    </>
+    </div>
   );
 }

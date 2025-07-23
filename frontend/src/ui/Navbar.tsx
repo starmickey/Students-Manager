@@ -12,6 +12,10 @@ const navLinks: NavLink[] = [
     label: "Translations",
     href: "admin/translations",
   },
+  {
+    label: "Languages",
+    href: "admin/languages",
+  },
 ];
 
 export default function Navbar() {
