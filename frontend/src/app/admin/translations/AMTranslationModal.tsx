@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  createTranslationSchema,
-  parseCreateTranslationSchemaErrors,
-} from "@/schemas/translateSchemas";
+import { createTranslationSchema } from "@/schemas/translateSchemas";
 import { Language } from "@/types/translator";
 import DialogWrapper, { Modal } from "@/ui/display/Dialog";
 import Button from "@/ui/form/Button";
@@ -11,9 +8,10 @@ import Input from "@/ui/form/Input";
 import Select from "@/ui/form/Select";
 import T from "@/ui/TranslatedWord";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { FaRegTrashCan as TrashIcon } from "react-icons/fa6";
 import { FaPlus as PlusIcon } from "react-icons/fa6";
+import z from "zod";
 
 interface WordDTO {
   word: string;
@@ -22,6 +20,12 @@ interface WordDTO {
 
 interface AMTranslationModalProps {
   languages: Language[];
+  action: "create" | "update";
+  trigger: ReactNode;
+  word?: {
+    key: string;
+    translations: WordDTO[];
+  };
 }
 
 /**
@@ -30,13 +34,22 @@ interface AMTranslationModalProps {
  */
 export default function AMTranslationModal({
   languages,
+  action,
+  trigger,
+  word,
 }: AMTranslationModalProps) {
   const router = useRouter();
 
   // Initialize one empty input with the first language
-  const defaultWord: WordDTO = { word: "", langCode: languages[0].code };
+  const defaultWord: WordDTO = {
+    word: "",
+    langCode: languages?.[0]?.code || "",
+  };
 
-  const [words, setWords] = useState<WordDTO[]>([defaultWord]);
+  // Words hook
+  const [words, setWords] = useState<WordDTO[]>(
+    action === "create" ? [defaultWord] : word?.translations || [defaultWord]
+  );
 
   // Validation errors from Zod or API
   const [errors, setErrors] = useState<{
@@ -84,21 +97,25 @@ export default function AMTranslationModal({
 
     const filteredWords = words.filter((w) => w.word.trim() !== "");
 
-    const result = createTranslationSchema.safeParse(filteredWords);
-
-    if (!result.success) {
-      setErrors(parseCreateTranslationSchemaErrors(result.error));
-      return;
-    }
-
-    const { word, translations } = result.data;
-
     try {
-      const res = await fetch("/api/translate/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word, translations }),
-      });
+      const validatedData = createTranslationSchema.parse(filteredWords);
+      
+      let res;
+
+      if (action === "create") {
+        res = await fetch("/api/translate/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(validatedData),
+        });
+      } else {
+        res = await fetch("/api/translate/update", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(validatedData),
+        });
+
+      }
 
       if (!res.ok) {
         const { message } = await res.json();
@@ -108,9 +125,23 @@ export default function AMTranslationModal({
 
       closeModal();
       router.refresh(); // Re-fetch table data
-    } catch (err) {
-      console.error("Submit error:", err);
-      setErrors({ logic: "An unexpected error occurred." });
+    } catch (error) {
+      // Show Zod Errors
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path.length > 0) {
+            fieldErrors[err.path[0].toString()] = err.message;
+          } else {
+            fieldErrors.logic = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+        console.error(fieldErrors);
+      } else {
+        console.error(error);
+        setErrors({ logic: "Se produjo un error inesperado." });
+      }
     }
   };
 
@@ -130,13 +161,13 @@ export default function AMTranslationModal({
       lockBackground={false}
       forceCloseIdx={forceCloseIdx}
       onClose={handleDialogClose}
-      trigger={<Button>New</Button>}
+      trigger={trigger}
       dialog={
         <Modal>
           <form onSubmit={handleSubmit}>
             <h1 className="text-xl font-semibold mb-4">
-              <T>Add word</T>
-            </h1>
+              {action === "create" ? <T>Add word</T> : <T>Update word</T>}
+            </ h1>
 
             {/* General (API or schema-level) logic error */}
             {errors.logic && (
@@ -156,6 +187,7 @@ export default function AMTranslationModal({
                     value={word}
                     isRequired={false}
                     variant="primary"
+                    placeholder="Enter a word"
                     aria-label="Enter a word"
                     errorMessage={errors.fields?.[index]?.word || ""}
                     onChange={(e) => handleWordChange(index, e.target.value)}

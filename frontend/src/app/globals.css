@@ -7,6 +7,7 @@
   --pink-10: #e2115e;
   --pink-12: #ba0045;
   --red: #f31260;
+  --yellow-2: #fffbf1;
   --yellow-3: #faeecc;
   --yellow-7: #ffdf86;
   --yellow-10: #fcc737;
@@ -185,7 +186,7 @@ a:hover {
 }
 
 h1 .word-skeleton {
-  height: var(--font-size-xl)
+  height: var(--font-size-xl);
 }
 /*************************************************/
 /*                    FORMS                      */
@@ -308,6 +309,15 @@ h1 .word-skeleton {
   color: var(--comp-color-secondary-text);
   background-color: var(--comp-color-secondary-bg);
 }
+.button-ghost {
+  border: 0;
+  color: var(--comp-color-primary-bg);
+  padding: 0.3rem;
+}
+.button-ghost:hover {
+  background-color: #e53b7a80;
+  color: var(--comp-color-primary-bg-hover);
+}
 
 /*************************************************/
 /*                  NAVBAR                       */
@@ -331,6 +341,7 @@ body:has(.navbar) main {
 .minimalistic-table {
   border-collapse: separate;
   border-spacing: 0 3px; /* adds space between rows */
+  overflow-x: auto;
   width: 100%;
 }
 
@@ -341,9 +352,13 @@ body:has(.navbar) main {
 .minimalistic-table th {
   background-color: var(--yellow-12);
   color: white;
+  text-align: start;
 }
 .minimalistic-table td {
   background-color: var(--yellow-3);
+}
+.minimalistic-table tr:hover td {
+  background-color: var(--yellow-2);
 }
 
 /* Round only the first and last cell of each row */
