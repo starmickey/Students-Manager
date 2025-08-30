@@ -1,20 +1,4 @@
 /**
- * ConfigError
- *
- * Thrown when a misconfiguration is detected during the initial setup of the application.
- * This is typically related to missing or invalid environment variables, or essential config values.
- *
- * Example use case:
- *   if (!process.env.API_KEY) throw new ConfigError("Missing API_KEY");
- */
-export class ConfigError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ConfigError';
-  }
-}
-
-/**
  * APIError
  *
  * Base class for HTTP-related errors. Contains a `status` code in addition to a message.

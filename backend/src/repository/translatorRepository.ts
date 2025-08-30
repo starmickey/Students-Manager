@@ -1,5 +1,5 @@
 import {BadRequest} from '../config/exceptions';
-import {getLogger} from '../config/logger';
+import logger from '../config/logger';
 import {
   ILanguage,
   ITranslation,
@@ -124,8 +124,6 @@ export async function getTranslation(
   key: string,
   languageCode: string,
 ): Promise<string> {
-  const logger = getLogger();
-
   const normalizedKey = key.toLowerCase().trim();
   const translation = await Translation.findOne({key: normalizedKey});
   const translatedWord = translation?.translations.get(languageCode);

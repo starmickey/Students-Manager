@@ -25,7 +25,7 @@ import {
 } from 'passport-google-oauth20';
 import {User} from '../models/securityModels';
 import {findOrCreateByGoogleIdUser} from '../repository/securityRepository';
-import {getLogger} from '../config/logger';
+import logger from '../config/logger';
 
 export interface GoogleCredentials {
   clientID: string;
@@ -56,13 +56,11 @@ export class PassportMiddleware {
    * @throws Error if already initialized
    */
   static init(credentials: Credentials) {
-    const logger = getLogger();
-
     if (PassportMiddleware.instance) {
       throw Error("Passport can't be initialized twice.");
     }
 
-    logger.verbose('Setting passport...');
+    logger.debug('Setting passport...');
     PassportMiddleware.instance = new PassportMiddleware(credentials);
   }
 
@@ -90,7 +88,6 @@ export class PassportMiddleware {
    * @returns Middleware that redirects to Google's OAuth consent screen
    */
   static authenticate() {
-    const logger = getLogger();
     const passport = PassportMiddleware.getInstance().passport;
 
     logger.debug('Authenticating...');
@@ -114,8 +111,7 @@ export class PassportMiddleware {
    * @param googleCredentials Object with Google OAuth clientID and clientSecret
    */
   private setGoogleOAuth20({clientID, clientSecret}: GoogleCredentials) {
-    const logger = getLogger();
-    logger.debug('Setting up Google OAuth authentication');
+    logger.debug('Setting up Google OAuth authentication...');
 
     this.passport.use(
       new GoogleStrategy(

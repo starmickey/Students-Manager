@@ -1,25 +1,23 @@
 import mongoose from "mongoose";
-import { getEnvironment } from "./config/env";
-import { initLogger } from "./config/logger";
+import { initEnv, MONGO_URI, NODE_ENV } from "./config/env";
 import { initExpress } from "./express";
+import logger from "./config/logger";
 
 /**
  * Application entry point.
  *
- * Loads configuration, initializes logger and Express server,
+ * Loads configuration, initializes the Express server,
  * and establishes connection to MongoDB using Mongoose.
  */
 
 // Load environment configuration variables
-const conf = getEnvironment();
+initEnv();
 
-// Initialize application logger based on current environment
-const logger = initLogger(conf.nodeEnv);
+logger.info(`Starting server in ${NODE_ENV} mode...`)
 
 // Initialize and start Express server
-initExpress(conf);
+initExpress();
 
-// Connect to MongoDB using Mongoose
-mongoose.connect(conf.mongoUri).then(() => {
+mongoose.connect(MONGO_URI).then(() => {
   logger.info("Mongoose connection established");
 });

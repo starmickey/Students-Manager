@@ -1,117 +1,137 @@
-import "dotenv/config";
-import { ConfigError } from "./exceptions";
-import { GoogleCredentials } from "../middleware/passport";
+import 'dotenv/config';
+import {z} from 'zod';
 
 /**
- * Defines the possible values for the application's environment mode.
+ * Zod schema used to validate and transform environment variables.
+ * - Ensures all required variables exist
+ * - Validates types and formats
+ * - Provides developer-friendly error messages on failure
  */
-export enum NodeEnv {
-  DEVELOPMENT = "development",
-  PRODUCTION = "production",
-}
+const envSchema = z.object({
+  GOOGLE_CLIENT_ID: z
+    .string()
+    .min(1, {message: 'GOOGLE_CLIENT_ID is required'}),
+  GOOGLE_CLIENT_SECRET: z
+    .string()
+    .min(1, {message: 'GOOGLE_CLIENT_SECRET is required'}),
+  JWT_SECRET: z.string().min(1, {message: 'JWT_SECRET is required'}),
+  LOGIN_REDIRECT_PATH: z.string().optional(),
+  MONGO_URI: z.string().min(1, {message: 'MONGO_URI is required'}),
+  NODE_ENV: z.enum(['development', 'production'], {
+    errorMap: () => ({
+      message: "NODE_ENV must be 'development' or 'production'",
+    }),
+  }),
+  PORT: z
+    .string()
+    .regex(/^\d+$/, {message: 'PORT must be a valid number'})
+    .transform(Number), // ensures PORT is parsed into a number
+});
 
 /**
- * Singleton class responsible for loading and managing environment variables.
- * Ensures that required variables are properly set and accessible.
+ * Type representing the validated environment variables.
+ * Inferred from the Zod schema.
+ */
+type EnvVars = z.infer<typeof envSchema>;
+
+/**
+ * Singleton class responsible for:
+ * - Loading environment variables (from `process.env`)
+ * - Validating them against the schema
+ * - Providing safe and typed access to them across the application
+ *
+ * This ensures the application fails fast on misconfiguration,
+ * rather than failing at runtime later.
  */
 export class Environment {
   static instance: Environment;
-  nodeEnv: NodeEnv;
-  port: number;
-  mongoUri: string;
-  googleCredentials: GoogleCredentials;
-  jswSecret: string;
-  loginRedirectPath: string | undefined;
+  env: EnvVars;
 
+  /**
+   * Private constructor ensures instantiation only via `getInstance` or `init`.
+   * Loads and validates environment variables at startup.
+   */
   private constructor() {
-    validateEnvironment(process.env);
+    this.env = Environment.loadEnvironment();
+  }
 
-    this.nodeEnv = process.env.NODE_ENV as NodeEnv;
-    this.port = Number(process.env.PORT);
-    this.mongoUri = process.env.MONGO_URI || "";
-    this.googleCredentials = {
-      clientID: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+  /**
+   * Parses and validates environment variables against the schema.
+   * If invalid, logs all errors and terminates the process.
+   *
+   * @returns {EnvVars} - Object containing validated environment variables.
+   */
+  private static loadEnvironment(): EnvVars {
+    try {
+      const env: EnvVars = envSchema.parse(process.env);
+      return env;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        console.error('❌ Invalid environment configuration:');
+        err.errors.forEach(e => {
+          console.error(`- ${e.path.join('.')}: ${e.message}`);
+        });
+        process.exit(1); // Stop app if environment is invalid
+      } else {
+        throw err; // Unexpected error
+      }
     }
-    this.jswSecret = process.env.JWT_SECRET || "";
-    this.loginRedirectPath = process.env.LOGIN_REDIRECT_PATH;
   }
 
   /**
    * Returns the singleton instance of the Environment class.
-   * If no instance exists, it initializes one.
+   * Initializes it if it does not already exist.
    *
-   * @returns {Environment} - The singleton instance of the Environment class.
+   * @returns {Environment} - Singleton instance.
    */
   static getInstance(): Environment {
     if (!Environment.instance) {
       Environment.instance = new Environment();
     }
-
     return Environment.instance;
   }
+
+  /**
+   * Forces initialization of the singleton instance.
+   * Useful for testing or reloading environment variables.
+   *
+   * @returns {Environment} - New instance of the Environment class.
+   */
+  static init(): Environment {
+    Environment.instance = new Environment();
+    return Environment.instance;
+  }
+
+  /**
+   * Provides safe, typed access to a specific environment variable.
+   *
+   * @param key - The key of the environment variable
+   * @returns The validated and typed value of the requested variable
+   */
+  public get<K extends keyof EnvVars>(key: K): EnvVars[K] {
+    return this.env[key];
+  }
 }
 
 /**
- * Provides a convenient function to retrieve the environment instance.
- *
- * @returns {Environment} - The singleton instance of the Environment class.
+ * Initializes the environment singleton.
+ * Can be called at application startup.
  */
-export const getEnvironment = (): Environment => Environment.getInstance();
+export const initEnv = (): Environment => Environment.init();
 
 /**
- * Enum containing descriptive error messages for missing or invalid environment variables.
+ * Exported constants for direct access to commonly used environment variables.
+ * These are loaded via the singleton and type-checked at startup.
  */
-enum ValidationErrors {
-  MISSING_NODE_ENV = "Environment variable 'NODE_ENV' is missing. Please set it to either 'development' or 'production' in your .env file.",
-  INVALID_NODE_ENV = "Invalid value for 'NODE_ENV'. Expected: 'development' or 'production'. Please update your .env file.",
-  MISSING_PORT = "Environment variable 'PORT' is missing. Please define a valid port number in your .env file.",
-  INVALID_PORT = "Invalid 'PORT' value detected. It must be a positive integer.",
-  MISSING_MONGO_URI = "Environment variable 'MONGO_URI' is missing. Please specify the database connection string in your .env file.",
-  MISSING_GOOGLE_CLIENT_ID = "Environment variable 'GOOGLE_CLIENT_ID' is missing. Please specify the database connection string in your .env file.",
-  MISSING_GOOGLE_CLIENT_SECRET = "Environment variable 'GOOGLE_CLIENT_SECRET' is missing. Please specify the database connection string in your .env file.",
-  MISSING_JWT_SECRET = "Environment variable 'JWT_SECRET' is missing. Please specify the database connection string in your .env file.",
-}
-
-
-/**
- * Validates that all required environment variables are correctly set.
- * Throws a `ConfigError` if any required variable is missing or invalid.
- *
- * @param {NodeJS.ProcessEnv} env - The environment variables object.
- * @throws {ConfigError} - If any required variable is missing or invalid.
- */
-function validateEnvironment(env: any) {
-  if (!env?.NODE_ENV) {
-    throw new ConfigError(ValidationErrors.MISSING_NODE_ENV);
-  }
-
-  if (!Object.values(NodeEnv).includes(env?.NODE_ENV as NodeEnv)) {
-    throw new ConfigError(ValidationErrors.INVALID_NODE_ENV);
-  }
-
-  if (!env.PORT) {
-    throw new ConfigError(ValidationErrors.MISSING_PORT);
-  }
-
-   // Ensures that PORT is a valid positive number
-  if (isNaN(env.PORT) || Number(env.PORT) < 0) {
-    throw new ConfigError(ValidationErrors.INVALID_PORT);
-  }
-  
-  if (!env.MONGO_URI || !env.MONGO_URI.trim()) {
-    throw new ConfigError(ValidationErrors.MISSING_MONGO_URI);
-  }
-
-  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_ID.trim()) {
-    throw new ConfigError(ValidationErrors.MISSING_GOOGLE_CLIENT_ID);
-  }
-
-  if (!env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_CLIENT_SECRET.trim()) {
-    throw new ConfigError(ValidationErrors.MISSING_GOOGLE_CLIENT_SECRET);
-  }
-
-  if (!env.JWT_SECRET || !env.JWT_SECRET.trim()) {
-    throw new ConfigError(ValidationErrors.MISSING_JWT_SECRET);
-  }
-}
+export const GOOGLE_CLIENT_ID =
+  Environment.getInstance().get('GOOGLE_CLIENT_ID');
+export const GOOGLE_CLIENT_SECRET = Environment.getInstance().get(
+  'GOOGLE_CLIENT_SECRET',
+);
+export const JWT_SECRET = Environment.getInstance().get('JWT_SECRET');
+export const LOGIN_REDIRECT_PATH = Environment.getInstance().get(
+  'LOGIN_REDIRECT_PATH',
+);
+export const MONGO_URI = Environment.getInstance().get('MONGO_URI');
+export const NODE_ENV = Environment.getInstance().get('NODE_ENV');
+export const PORT = Environment.getInstance().get('PORT');

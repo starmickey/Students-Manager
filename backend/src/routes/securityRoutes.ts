@@ -1,8 +1,9 @@
 import {Router} from 'express';
-import {getLogger} from '../config/logger';
+import logger from '../config/logger';
 import jwt from 'jsonwebtoken';
-import {getEnvironment} from '../config/env';
 import {PassportMiddleware} from '../middleware/passport';
+import { useExceptionsMiddleware } from '../middleware/exceptions';
+import { JWT_SECRET, LOGIN_REDIRECT_PATH } from '../config/env';
 
 /**
  * getSecurityRoutes
@@ -29,23 +30,20 @@ import {PassportMiddleware} from '../middleware/passport';
  *
  * @returns {Router} Express router with security routes configured.
  */
-export function getSecurityRoutes() {
+export function getSecurityRoutes(): Router {
   const router = Router();
 
   // Route to initiate Google OAuth login
-  router.get('/google', PassportMiddleware.authenticate());
+  router.get('/google', useExceptionsMiddleware(PassportMiddleware.authenticate()));
 
   // OAuth callback route
-  router.get('/google/redirect', (req, res, next) => {
-    const logger = getLogger();
-    const {jswSecret, loginRedirectPath} = getEnvironment();
-
+  router.get('/google/redirect', useExceptionsMiddleware((req, res, next) => {
     PassportMiddleware.checkAuthenticationStatus((err, user, info) => {
       // Handle errors during authentication
       if (err) {
         logger.error('Authentication error:', err);
-        if (loginRedirectPath) {
-          return res.redirect(`${loginRedirectPath}?error=UnexpectedError`);
+        if (LOGIN_REDIRECT_PATH) {
+          return res.redirect(`${LOGIN_REDIRECT_PATH}?error=UnexpectedError`);
         } else {
           return res.status(500).json({error: 'Authentication failed', details: err.message});
         }
@@ -53,23 +51,23 @@ export function getSecurityRoutes() {
 
       // Handle case where user is not found
       if (!user) {
-        if (loginRedirectPath) {
-          return res.redirect(`${loginRedirectPath}?error=NoUserFound`);
+        if (LOGIN_REDIRECT_PATH) {
+          return res.redirect(`${LOGIN_REDIRECT_PATH}?error=NoUserFound`);
         } else {
           return res.status(401).json({error: 'No user found', info});
         }
       }
 
       // Successful authentication: sign JWT and respond or redirect
-      const token = jwt.sign({id: user.id}, jswSecret);
+      const token = jwt.sign({id: user.id}, JWT_SECRET);
 
-      if (loginRedirectPath) {
-        return res.redirect(`${loginRedirectPath}?token=${token}`);
+      if (LOGIN_REDIRECT_PATH) {
+        return res.redirect(`${LOGIN_REDIRECT_PATH}?token=${token}`);
       } else {
         return res.json({user, token});
       }
     })(req, res, next);
-  });
+  }));
 
   return router;
 }

@@ -24,7 +24,7 @@
  * @returns Express.Router instances with the defined routes.
  */
 
-import { Router } from 'express';
+import {Router} from 'express';
 import {
   createLanguageController,
   createTranslationController,
@@ -34,6 +34,7 @@ import {
   updateLanguageController,
   updateTranslationController,
 } from '../controllers/translateControllers';
+import {useExceptionsMiddleware} from '../middleware/exceptions';
 
 /**
  * Defines and returns routes related to translations.
@@ -44,10 +45,10 @@ import {
 export function getTranslateRoutes() {
   const router = Router();
 
-  router.get('/', getTranslationsController);               // Paginated list of all translations
-  router.get('/:word', getTranslationController);           // Translation for a specific word
-  router.post('/create', createTranslationController);      // Create new translation
-  router.put('/update', updateTranslationController);       // Update existing translation
+  router.get('/', useExceptionsMiddleware(getTranslationsController)); // Paginated list of all translations
+  router.get('/:word', useExceptionsMiddleware(getTranslationController)); // Translation for a specific word
+  router.post('/create', useExceptionsMiddleware(createTranslationController)); // Create new translation
+  router.put('/update', useExceptionsMiddleware(updateTranslationController)); // Update existing translation
 
   return router;
 }
@@ -61,9 +62,9 @@ export function getTranslateRoutes() {
 export function getLanguageRoutes() {
   const router = Router();
 
-  router.get('/', getLanguagesController);                  // Paginated list of all languages
-  router.post('/create', createLanguageController);         // Create new language
-  router.put('/update', updateLanguageController);          // Update language by code
+  router.get('/', useExceptionsMiddleware(getLanguagesController)); // Paginated list of all languages
+  router.post('/create', useExceptionsMiddleware(createLanguageController)); // Create new language
+  router.put('/update', useExceptionsMiddleware(updateLanguageController)); // Update language by code
 
   return router;
 }

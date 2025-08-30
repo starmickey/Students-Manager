@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { getLogger } from "../config/logger";
+import logger from "../config/logger";
 import { getControlRoutes } from "./controlRoutes";
 import { getLanguageRoutes, getTranslateRoutes } from "./translateRoutes";
 import { getSecurityRoutes } from "./securityRoutes";
@@ -24,10 +24,9 @@ import { getSecurityRoutes } from "./securityRoutes";
  */
 export function getRoutes() {
   const router = Router();
-  const logger = getLogger();
 
   // Log every API call with details
-  router.use("/", (req: Request, res: Response, next: NextFunction) => {
+  router.use("/", (req: Request, _, next: NextFunction) => {
     const { method, url, headers, body, ip } = req;
     
     logger.http(`${method} ${url} - IP: ${ip}`);
@@ -44,7 +43,7 @@ export function getRoutes() {
   router.use("/languages", getLanguageRoutes());
 
   // Handle unmatched routes with 404
-  router.use("/", (req: Request, res: Response) => {
+  router.use("/", (_, res: Response) => {
     res.status(404).send("Page not found");
   });
 

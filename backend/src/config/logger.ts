@@ -1,6 +1,5 @@
-import { NodeEnv } from "./env";
+import { NODE_ENV } from "./env";
 import winston from "winston";
-import { ConfigError } from "./exceptions";
 
 /**
  * Custom winston formatter for the messages that are printed 
@@ -32,9 +31,9 @@ class Logger {
   static instance: Logger;
   logger: winston.Logger;
 
-  private constructor(nodeEnv: NodeEnv) {
+  public constructor() {
     this.logger = winston.createLogger({
-      level: nodeEnv === NodeEnv.PRODUCTION ? "info" : "debug",
+      level: NODE_ENV === "production" ? "info" : "debug",
       format: fileFormat,
       // defaultMeta: { service: 'user-service' },
       transports: [
@@ -49,39 +48,20 @@ class Logger {
   }
 
   /**
-   * Creates a Winston logger.
-   * 
-   * @param nodeEnv Node Environment. Ex: 'production'
-   * @returns a Winston Logger
-   */
-  public static initLogger(nodeEnv: NodeEnv) {
-    if (Logger.instance) {
-      throw new ConfigError("Logger already initialized");
-    }
-    
-    Logger.instance = new Logger(nodeEnv);
-    return Logger.instance.logger;
-  }
-
-  /**
    * Gets the Winston logger.
    * 
-   * @throws ConfigError if the logger is already initialized.
    * @returns a Winston Logger
    */
   public static getLogger() {
     if (!Logger.instance) {
-      throw new ConfigError("Logger not initialized. Run initLogger first.");
+      Logger.instance = new Logger();
     }
     return Logger.instance.logger;
   }
 }
 
-
 /**
- * Convenient functions for using Logger functions.S
+ * Convenient functions for using Logger functions.
  */
-export const initLogger = (nodeEnv: NodeEnv) => Logger.initLogger(nodeEnv);
-
-export const getLogger = () => Logger.getLogger();
+export default Logger.getLogger();
 

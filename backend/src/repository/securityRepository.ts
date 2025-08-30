@@ -1,4 +1,4 @@
-import { getLogger } from '../config/logger';
+import logger from '../config/logger';
 import { IUser, User } from '../models/securityModels';
 
 interface findOrCreateByGoogleIdUserProps {
@@ -32,8 +32,6 @@ interface findOrCreateByGoogleIdUserProps {
 export async function findOrCreateByGoogleIdUser(
   userDTO: findOrCreateByGoogleIdUserProps,
 ): Promise<IUser> {
-  const logger = getLogger();
-
   // Try to find a user by googleId
   let user = await User.findOne({ googleId: userDTO.googleId });
 
