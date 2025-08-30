@@ -1,6 +1,4 @@
-import PaginatedDataTable, {
-  PaginatedTableColumn,
-} from "@/ui/tables/PaginatedDataTable";
+import PaginatedDataTable, { Column } from "@/ui/tables/DataTable";
 import { fetchPage, FetchPageProps } from "@/services/paginator";
 import T from "@/ui/TranslatedWord";
 import AMTranslationModal from "./AMTranslationModal";
@@ -20,13 +18,14 @@ export default async function Page({
   const [languages, translations] = await Promise.all([
     fetchPage<Language>({ api: "languages" }),
     fetchPage<Record<string, string>>({
+      pageSize: 15,
       ...params,
       api: "translate",
     }),
   ]);
 
   // Crear configuración de tabla
-  const columns: PaginatedTableColumn[] = [
+  const columns: Column[] = [
     {
       key: "key",
       name: "Code",
@@ -100,8 +99,10 @@ export default async function Page({
           <PaginatedDataTable
             columns={columns}
             data={tableData}
-            page={translations.page}
-            totalPages={translations.totalPages}
+            pagination={{
+              page: translations.page,
+              totalPages: translations.totalPages,
+            }}
           />
         ) : languages.data.length > 0 ? (
           <T>No translations</T>

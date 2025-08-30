@@ -1,8 +1,6 @@
 import { fetchPage, FetchPageProps } from "@/services/paginator";
 import { Language } from "@/types/translator";
-import PaginatedDataTable, {
-  PaginatedTableColumn,
-} from "@/ui/tables/PaginatedDataTable";
+import DataTable, { Column } from "@/ui/tables/DataTable";
 import T from "@/ui/TranslatedWord";
 
 export default async function Page({
@@ -13,7 +11,7 @@ export default async function Page({
   const params = await searchParams;
   const languages = await fetchPage<Language>({ ...params, api: "languages" });
 
-  const columns: PaginatedTableColumn[] = [
+  const columns: Column[] = [
     {
       key: "code",
       name: "Code",
@@ -40,11 +38,13 @@ export default async function Page({
 
       <section>
         {languages.data.length > 0 ? (
-          <PaginatedDataTable
+          <DataTable
             columns={columns}
             data={tableData}
-            page={languages.page}
-            totalPages={languages.totalPages}
+            pagination={{
+              page: languages.page,
+              totalPages: languages.totalPages,
+            }}
           />
         ) : (
           <T>No languages</T>
