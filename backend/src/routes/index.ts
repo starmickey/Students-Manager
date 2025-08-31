@@ -3,6 +3,7 @@ import logger from "../config/logger";
 import { getControlRoutes } from "./controlRoutes";
 import { getLanguageRoutes, getTranslateRoutes } from "./translateRoutes";
 import { getSecurityRoutes } from "./securityRoutes";
+import { getCoursesRoutes, getSubjectRoutes } from "./coursesRoutes";
 
 /**
  * Main Routes Setup
@@ -39,8 +40,10 @@ export function getRoutes() {
   // Mount the individual route modules
   router.use("/auth", getSecurityRoutes());
   router.use("/control", getControlRoutes());
-  router.use("/translate", getTranslateRoutes());
+  router.use("/courses", getCoursesRoutes());
   router.use("/languages", getLanguageRoutes());
+  router.use("/subjects", getSubjectRoutes());
+  router.use("/translate", getTranslateRoutes());
 
   // Handle unmatched routes with 404
   router.use("/", (_, res: Response) => {

@@ -1,91 +1,28 @@
-import {Document, Model, model, Schema, Types} from 'mongoose';
+import {Document, Model, model, Query, Schema, Types} from 'mongoose';
+import {withHelpers} from '../config/helpers/mongooseHelpers';
+
 /**
- * Course models keep the student or teacher role and progress in each course
+ * Possible statuses for a Course.
  */
-
-// Course status
-
-interface ICourseStatus extends Document {
-  name: String;
-  description: string;
-  removeDate?: Date;
+enum CourseStatusEnum {
+  Active = 'active',
+  Closed = 'closed',
 }
 
-const courseStatusSchema = new Schema<ICourseStatus>({
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: '',
-  },
-  removeDate: Date,
-});
-
-const CourseStatus: Model<ICourseStatus> = model<ICourseStatus>(
-  'CourseStatus',
-  courseStatusSchema,
-);
-
-// Course status history
-
-interface ICourseStatusHistoryEntry extends Document {
-  status: Types.ObjectId;
-  date: Date;
-}
-const courseStatusHistoryEntrySchema = new Schema<ICourseStatusHistoryEntry>({
-  status: {
-    type: Schema.Types.ObjectId,
-    ref: 'CourseStatus',
-    required: true,
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-});
-
-const CourseStatusHistoryEntry: Model<ICourseStatusHistoryEntry> =
-  model<ICourseStatusHistoryEntry>(
-    'CourseStatusHistoryEntry',
-    courseStatusHistoryEntrySchema,
-  );
-
-// Establishment
-
-interface IEstablishment extends Document {
-  name: String;
-  description: String;
-  removeDate?: Date;
-}
-const establishmentSchema = new Schema<IEstablishment>({
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: '',
-  },
-  removeDate: Date,
-});
-
-const Establishment: Model<IEstablishment> = model<IEstablishment>(
-  'Establishment',
-  establishmentSchema,
-);
-
-// Course
-
+/**
+ * Course Interface
+ */
 interface ICourse extends Document {
   name: string;
   description: string;
-  currentStatus?: Types.ObjectId;
-  statusHistory?: Types.ObjectId[];
-  establishment?: Types.ObjectId;
+  currentStatus: CourseStatusEnum; // Use enum here
+  subject: Types.ObjectId;
+  removeDate: Date | null;
 }
 
+/**
+ * Course Schema
+ */
 const courseSchema = new Schema<ICourse>({
   name: {
     type: String,
@@ -96,25 +33,62 @@ const courseSchema = new Schema<ICourse>({
     default: '',
   },
   currentStatus: {
+    type: String,
+    required: true,
+    enum: Object.values(CourseStatusEnum), // restrict to enum values
+    default: CourseStatusEnum.Active,
+  },
+  subject: {
     type: Schema.Types.ObjectId,
-    ref: 'CourseStatus',
+    ref: 'Subject',
     required: true,
   },
-  statusHistory: {
-    type: [courseStatusHistoryEntrySchema],
-    default: [],
+  removeDate: {
+    type: Date,
+    default: null,
   },
 });
 
-const Course: Model<ICourse> = model<ICourse>('Course', courseSchema);
+// Pre hook to only return courses whose remove date is null on find operations
+courseSchema.pre<Query<ISubject[], ISubject>>(/^find/, function (next) {
+  this.where({removeDate: null});
+  next();
+});
 
-export {
-  ICourseStatus,
-  ICourseStatusHistoryEntry,
-  IEstablishment,
-  ICourse,
-  CourseStatus,
-  CourseStatusHistoryEntry,
-  Establishment,
-  Course,
-};
+/**
+ * Subject Interface and Schema
+ */
+interface ISubject extends Document {
+  name: string;
+  description: string;
+  removeDate: Date | null;
+}
+
+const subjectSchema = new Schema<ISubject>({
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  removeDate: {
+    type: Date,
+    default: null,
+  },
+});
+
+// Pre hook to only return subjects whose remove date is null on find operations
+subjectSchema.pre<Query<ISubject[], ISubject>>(/^find/, function (next) {
+  this.where({removeDate: null});
+  next();
+});
+
+const CourseModel: Model<ICourse> = model<ICourse>('Course', courseSchema);
+const SubjectModel: Model<ISubject> = model<ISubject>('Subject', subjectSchema);
+
+const Course = withHelpers<ICourse, typeof CourseModel>(CourseModel);
+const Subject = withHelpers<ISubject, typeof SubjectModel>(SubjectModel);
+
+export {ISubject, ICourse, CourseStatusEnum, Subject, Course};

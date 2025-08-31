@@ -31,9 +31,9 @@ import {flatenTranslation} from '../services/translationServices';
  *  - 400 Bad Request: If query params are invalid
  */
 export async function getLanguagesController(req: Request, res: Response) {
-  const {page, pageSize, sort} = paginationSchema.parse(req.query);
-  const result = await getLanguagesPage({page, pageSize, sort});
-  res.send(result);
+  const paginationProps = paginationSchema.parse(req.query);
+  const result = await getLanguagesPage(paginationProps);
+  res.status(200).send(result);
 }
 
 /**
@@ -123,7 +123,7 @@ export async function getTranslationController(req: Request, res: Response) {
     ...req.query,
   });
   const translation = await getTranslation(word, language);
-  res.send({translation});
+  res.status(200).send({translation});
 }
 
 /**
@@ -139,8 +139,8 @@ export async function getTranslationController(req: Request, res: Response) {
  *  - 400 Bad Request: If query parameters are invalid
  */
 export async function getTranslationsController(req: Request, res: Response) {
-  const {page, pageSize, sort} = paginationSchema.parse(req.query);
-  const result = await getTranslationsPage({page, pageSize, sort});
+  const paginationProps = paginationSchema.parse(req.query);
+  const result = await getTranslationsPage(paginationProps);
   const formattedData = result.data.map(entry => flatenTranslation(entry));
-  res.send({...result, data: formattedData});
+  res.status(200).send({...result, data: formattedData});
 }

@@ -1,5 +1,6 @@
 import { Model, model, Query, Schema, Document } from "mongoose";
 import { BadRequest } from "../config/exceptions";
+import { withHelpers } from "../config/helpers/mongooseHelpers";
 
 /**
  * LANGUAGE MODEL
@@ -144,8 +145,11 @@ async function parseTranslations(translations: MapIterator<[string, string]>): P
 }
 
 // Mongoose Models
-const Language: Model<ILanguage> = model<ILanguage>("Language", languageSchema);
-const Translation: Model<ITranslation> = model<ITranslation>("Translation", translationSchema);
+const LanguageModel: Model<ILanguage> = model<ILanguage>("Language", languageSchema);
+const TranslationModel: Model<ITranslation> = model<ITranslation>("Translation", translationSchema);
+
+const Language = withHelpers<ILanguage, typeof LanguageModel>(LanguageModel);
+const Translation = withHelpers<ITranslation, typeof TranslationModel>(TranslationModel);
 
 // Export interfaces and models
 export {

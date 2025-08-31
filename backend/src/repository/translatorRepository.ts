@@ -1,4 +1,5 @@
 import {BadRequest} from '../config/exceptions';
+import { FetchPageQueryProps } from '../config/helpers/mongooseHelpers';
 import logger from '../config/logger';
 import {
   ILanguage,
@@ -6,18 +7,20 @@ import {
   Language,
   Translation,
 } from '../models/translatorModels';
-import {fetchPage, FetchPageProps} from './common';
 
 /**
  * Fetches a paginated list of languages.
  *
  * @function getLanguagesPage
- * @param {Omit<FetchPageProps<ILanguage>, 'model'>} props - Pagination and filter options
+ * @param {FetchPageQueryProps} props - Pagination and filter options
  * @returns {Promise<PaginatedResult<ILanguage>>} List of languages matching the query
  */
-export const getLanguagesPage = async (
-  props: Omit<FetchPageProps<ILanguage>, 'model'>,
-) => fetchPage<ILanguage>({model: Language, ...props});
+
+export const getLanguagesPage = async (props: FetchPageQueryProps) => {
+  const query = Language.fetchPage(props);
+  const data = await query.exec();
+  return {...query.meta, data};
+};
 
 /**
  * Creates a new language entry.
@@ -142,9 +145,11 @@ export async function getTranslation(
  * Fetches a paginated list of translations.
  *
  * @function getTranslationsPage
- * @param {Omit<FetchPageProps<ITranslation>, 'model'>} props - Pagination and filter options
+ * @param {FetchPageQueryProps} props - Pagination and filter options
  * @returns {Promise<PaginatedResult<ITranslation>>} List of translations matching the query
  */
-export const getTranslationsPage = async (
-  props: Omit<FetchPageProps<ITranslation>, 'model'>,
-) => fetchPage<ITranslation>({model: Translation, ...props});
+export const getTranslationsPage = async (props: FetchPageQueryProps) => {
+  const query = Translation.fetchPage(props);
+  const data = await query.exec();
+  return {...query.meta, data};
+};

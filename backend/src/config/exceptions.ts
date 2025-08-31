@@ -36,3 +36,10 @@ export class BadRequest extends APIError {
     this.name = 'BadRequest';
   }
 }
+
+export class NotFound extends APIError {
+  constructor(message: string) {
+    super(404, message);
+    this.name = 'NotFound';
+  }
+}
